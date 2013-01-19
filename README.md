@@ -1,4 +1,4 @@
 ess
 ===
 
-the Embedded Systems Simulator
+the Embedded Systems Simulator - featuring Lunar Lander!
