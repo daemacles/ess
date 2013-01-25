@@ -1,0 +1,3 @@
+class Ground:public Entity {
+
+};

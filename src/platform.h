@@ -1,0 +1,3 @@
+class Platform:public Entity {
+
+};
