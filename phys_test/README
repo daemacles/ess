@@ -2,9 +2,7 @@ This has some little test programs for messing around with physics engines.
 
 Run 'make' to build them.
 
-Requires the libBullet with development files.  On Ubuntu,
-
-  sudo apt-get install libbullet2.80 libbullet-dev
-
-or whatever version of bullet you have.
+Requires libBullet with development files.  Recommended that you always have
+the latest version (2.81 as of this writing) because instabilities tend to get
+fixed.
 
