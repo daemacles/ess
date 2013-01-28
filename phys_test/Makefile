@@ -1,7 +1,7 @@
 CC = g++-4.7
-CFLAGS = $(OPTIMIZE) -Wall -g -I. -I/usr/include/bullet
-CLIBS = -L. -lBulletSoftBody -lBulletDynamics -lBulletCollision \
-        -lLinearMath -lOpenGLSupport -lm -lGL -lGLU -lglut 
+CFLAGS = $(OPTIMIZE) -std=c++11 -Wall -g -I. $(shell pkg-config bullet --cflags)
+CLIBS = -L. -lOpenGLSupport $(shell pkg-config bullet --libs) \
+        -lm -lGL -lGLU -lglut 
 OBJS = main.o CcdPhysicsDemo.o
 EXE = demo
 

@@ -8,12 +8,12 @@
   for any purpose, including commercial applications, and to alter it and
   redistribute it freely, subject to the following restrictions:
 
-  1. The origin of this software must not be misrepresented; you must not claim
-  that you wrote the original software. If you use this software in a product,
-  an acknowledgment in the product documentation would be appreciated but is not
-  required.  2. Altered source versions must be plainly marked as such, and must
-  not be misrepresented as being the original software.  3. This notice may not
-  be removed or altered from any source distribution.
+  1. The origin of this software must not be misrepresented; you must not
+  claim that you wrote the original software. If you use this software in a
+  product, an acknowledgment in the product documentation would be appreciated
+  but is not required.  2. Altered source versions must be plainly marked as
+  such, and must not be misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
 */
 
 #include <stdio.h> // printf debugging
@@ -118,7 +118,7 @@ void CcdPhysicsDemo::initPhysics() {
     setTexturing(true);
     setShadows(true);
  
-    m_ShootBoxInitialSpeed = 4000.f;
+    m_ShootBoxInitialSpeed = 80.f;
 
     /// collision configuration contains default setup for memory, collision setup
     m_collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -126,7 +126,8 @@ void CcdPhysicsDemo::initPhysics() {
 
     /// use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
     m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
-    m_dispatcher->registerCollisionCreateFunc(BOX_SHAPE_PROXYTYPE,BOX_SHAPE_PROXYTYPE,m_collisionConfiguration->getCollisionAlgorithmCreateFunc(CONVEX_SHAPE_PROXYTYPE,CONVEX_SHAPE_PROXYTYPE));
+    m_dispatcher->registerCollisionCreateFunc(BOX_SHAPE_PROXYTYPE, BOX_SHAPE_PROXYTYPE,
+         m_collisionConfiguration->getCollisionAlgorithmCreateFunc(CONVEX_SHAPE_PROXYTYPE,CONVEX_SHAPE_PROXYTYPE));
 
     m_broadphase = new btDbvtBroadphase();
 
@@ -135,7 +136,7 @@ void CcdPhysicsDemo::initPhysics() {
     m_solver = sol;
 
     m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher,m_broadphase,m_solver,m_collisionConfiguration);
-    m_dynamicsWorld ->setDebugDrawer(&sDebugDrawer);
+    m_dynamicsWorld->setDebugDrawer(&sDebugDrawer);
     m_dynamicsWorld->getSolverInfo().m_splitImpulse=true;
     m_dynamicsWorld->getSolverInfo().m_numIterations = 20;
 
@@ -178,35 +179,59 @@ void CcdPhysicsDemo::initPhysics() {
         btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
         btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,groundShape,localInertia);
         btRigidBody* body = new btRigidBody(rbInfo);
+        body->setRestitution(.8);
 
         // add the body to the dynamics world
         m_dynamicsWorld->addRigidBody(body);
     }
 
+    btCollisionShape* boxShape = new btBoxShape(btVector3(1,1,1));
+    m_collisionShapes.push_back(boxShape);
+
+    ///  Create Dynamic Objects
+    btTransform startTransform;
+    startTransform.setIdentity();
+
+    btScalar mass(1.f);
+
+    // rigidbody is dynamic if and only if mass is non zero, otherwise static
+    bool isDynamic = (mass != 0.f);
+
+    btVector3 localInertia(0,0,0);
+    if (isDynamic)
+        boxShape->calculateLocalInertia(mass,localInertia);
+
+
+    {
+        btScalar mass{5.f};
+        btTransform trans;
+        trans.setIdentity();
+        btVector3 pos(0,10,-5);
+        trans.setOrigin(pos);
+
+        btCollisionShape *sphereShape = new btSphereShape(1);
+        m_collisionShapes.push_back(sphereShape); // goes into index 3
+        btCollisionShape *coneShape = new btConeShape(.25,.5);
+        m_collisionShapes.push_back(coneShape); // goes into index 4
+        
+        btVector3 localInertia(0,0,0);
+        sphereShape->calculateLocalInertia(mass, localInertia);
+        coneShape->calculateLocalInertia(2.f, localInertia);
+        btDefaultMotionState *myMotionState = new btDefaultMotionState(trans);
+        btRigidBody::btRigidBodyConstructionInfo cInfo(mass, myMotionState,
+                                                       sphereShape, localInertia);
+        btRigidBody *body = new btRigidBody(cInfo);
+        m_sphere = body;
+        body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
+        body->setRestitution(0.5);
+        m_dynamicsWorld->addRigidBody(body);
+    }
+
+    /*
     {
         // create a few dynamic rigidbodies
         // Re-using the same collision is better for memory usage and performance
-
-        btCollisionShape* colShape = new btBoxShape(btVector3(1,1,1));
-
-        // btCollisionShape* colShape = new btSphereShape(btScalar(1.));
-        m_collisionShapes.push_back(colShape);
-
-        ///  Create Dynamic Objects
-        btTransform startTransform;
-        startTransform.setIdentity();
-
-        btScalar mass(1.f);
-
-        // rigidbody is dynamic if and only if mass is non zero, otherwise static
-        bool isDynamic = (mass != 0.f);
-
-        btVector3 localInertia(0,0,0);
-        if (isDynamic)
-            colShape->calculateLocalInertia(mass,localInertia);
-
         int gNumObjects = 120;
-
         for (int i=0; i != gNumObjects; ++i) {
             btCollisionShape* shape = m_collisionShapes[1];
    
@@ -225,12 +250,13 @@ void CcdPhysicsDemo::initPhysics() {
             }
 
             btVector3 pos(col*2*CUBE_HALF_EXTENTS + (row2%2)*CUBE_HALF_EXTENTS,
-                          row*2*CUBE_HALF_EXTENTS+CUBE_HALF_EXTENTS+EXTRA_HEIGHT,0);
+                          row*2*CUBE_HALF_EXTENTS+CUBE_HALF_EXTENTS+EXTRA_HEIGHT,
+                          0);
             trans.setOrigin(pos);
  
             float mass = 1.f;
             btRigidBody* body = localCreateRigidBody(mass,trans,shape);
-            body->setRestitution(.5);
+            body->setRestitution(.8);
  
             /// when using m_ccdMode
             if (m_ccdMode==USE_CCD) {
@@ -239,6 +265,7 @@ void CcdPhysicsDemo::initPhysics() {
             }
         }
     }
+    */
 }
 
 void CcdPhysicsDemo::clientResetScene() {
@@ -259,6 +286,15 @@ void CcdPhysicsDemo::keyboardCallback(unsigned char key, int x, int y) {
         }
         };
         clientResetScene();
+    } else if (key == 'w') {
+        m_sphere->setActivationState(ACTIVE_TAG);
+        btVector3 impulse = btVector3(0,1,0);
+        impulse.normalize();
+        float impulseStrength = 50.f;
+        impulse *= impulseStrength;
+        btVector3 relPos(0,0,0);//m_sphere->getCenterOfMassPosition();
+        relPos[1] -= 10;
+        m_sphere->applyImpulse(impulse,relPos);
     } else {
         DemoApplication::keyboardCallback(key,x,y);
     }
@@ -267,24 +303,24 @@ void CcdPhysicsDemo::keyboardCallback(unsigned char key, int x, int y) {
 
 void CcdPhysicsDemo::shootBox(const btVector3& destination) {
     if (m_dynamicsWorld) {
-        float mass = 1.f;
+        float mass = 0.4f;
+        btVector3 camPos = getCameraPosition();
+
         btTransform startTransform;
         startTransform.setIdentity();
-        btVector3 camPos = getCameraPosition();
         startTransform.setOrigin(camPos);
 
         setShootBoxShape ();
 
         btRigidBody* body = this->localCreateRigidBody(mass, startTransform, m_shootBoxShape);
         body->setLinearFactor(btVector3(1,1,1));
-        body->setRestitution(.5);
+        body->setRestitution(0.2);
 
         btVector3 linVel(destination[0]-camPos[0],
                          destination[1]-camPos[1],
                          destination[2]-camPos[2]);
         linVel.normalize();
-        //linVel *= m_ShootBoxInitialSpeed;
-        linVel *= 80;
+        linVel *= m_ShootBoxInitialSpeed;
 
         body->getWorldTransform().setOrigin(camPos);
         body->getWorldTransform().setRotation(btQuaternion(0,0,0,1));
