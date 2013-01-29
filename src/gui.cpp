@@ -4,17 +4,22 @@
 
 #include "gui.h"
 #include "glwidget.h"
+#include "openglobject.h"
 
 GUI::GUI(EntityHandler* entityhandler, Simulator* sim) {
 }
 
 void GUI::setup() {
 
-    QWidget* window = new QWidget;
+    QWidget* window = this;
 
     GLWidget* glCanvas = new GLWidget(window);
-    glCanvas->resize(1024,768);
+    glCanvas->setMinimumSize(768,480);
+    //glCanvas->resize(700,500);
     glCanvas->draw();
+
+    //OpenGLObject* globj = new OpenGLObject;
+    //globj->draw(0,0,0);
 
     QVBoxLayout* vlayout = new QVBoxLayout;
 
@@ -40,18 +45,8 @@ void GUI::setup() {
 
     window->setLayout(vlayout);
     window->show();
+}
 
-    /*
-    GLWidget* window = new GLWidget(window);
-    //window->resize(320, 240);
-    QLabel label1("Hello, world!", window);
-    QLabel label2("Hello, world!", window);
-    QLabel label3("Hello, world!", window);
-    QLabel label3("Hello, world!", window);
-    QLabel label1("Hello, world!", window);
-    window->show();
-    window->setWindowTitle(
-        QApplication::translate("helloworld", "Hello World"));
-    //return app.exec();
-    */
+void GUI::draw() {
+
 }

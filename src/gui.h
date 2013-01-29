@@ -11,4 +11,5 @@ class GUI: public QWidget {
     public:
         GUI(EntityHandler* entityhandler, Simulator* sim);
         void setup();
+        void draw();
 };

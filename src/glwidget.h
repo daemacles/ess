@@ -13,9 +13,9 @@ class GLWidget : public QGLWidget
 
         void saveGLState();
         void restoreGLState();
-        void GLResize(int width, int height);
 
         public slots:
+            void beginDraw();
             void draw();
 
     private:

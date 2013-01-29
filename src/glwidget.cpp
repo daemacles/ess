@@ -1,7 +1,7 @@
 #include <QtGui/QImage>
-#include "glwidget.h"
-
 #include <math.h>
+
+#include "glwidget.h"
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D
@@ -10,8 +10,9 @@
     GLWidget::GLWidget(QWidget *parent)
 : QGLWidget(QGLFormat(QGL::SampleBuffers|QGL::AlphaChannel), parent)
 {
-    //makeCurrent();
-    draw();
+    makeCurrent();
+    glViewport(0,0,768,480);
+    QPainter p(this);
     return;
 }
 
@@ -24,36 +25,28 @@ GLWidget::~GLWidget()
         delete render_fbo;
 }
 
+void GLWidget::beginDraw() {
+
+}
+
 void GLWidget::draw()
 {
-    QPainter p(this); // used for text overlay
+    glMatrixMode(GL_PROJECTION);
+    glOrtho(-2.0, 2.0, -2.0, 2.0, 0.0, 3.0);
+    //glTranslatef(0,0,-4);
 
-    glClearColor(1.0, 0.0, 0.0, 1.0);
+    glMatrixMode(GL_MODELVIEW);
+
+    glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
-    glLoadIdentity();
-    glTranslatef(0.0, 0.0, -5.0);
-    glBegin(GL_QUADS);
-    glVertex3f(-1.0f, -1.0f, 0.0f);
-    glVertex3f(-1.0f, 1.0f, 0.0f);
+
+    glBegin(GL_TRIANGLES);
     glVertex3f(1.0f, 1.0f, 0.0f);
-    glVertex3f(1.0f, -1.0f, 0.0f);
+    glVertex3f(1, -1, 0.0f);
+    glVertex3f(-1.0f, -1, 0.0f);
     glEnd();
 
     glFlush();
 
     return;
-}
-
-void GLWidget::GLResize(int width, int height) {
-    int side = qMin(width, height);
-    glViewport((width - side) / 2, (height - side) / 2, side, side);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-#ifdef QT_OPENGL_ES_1
-    glOrthof(-0.5, +0.5, -0.5, +0.5, 4.0, 15.0);
-#else
-    glOrtho(-0.5, +0.5, -0.5, +0.5, 4.0, 15.0);
-#endif
-    glMatrixMode(GL_MODELVIEW);
 }
