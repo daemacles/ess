@@ -1,10 +1,12 @@
 #include <QLabel>
 #include <QFrame>
 #include <QDesktopWidget>
+#include <string>
 
 #include "gui.h"
 #include "glwidget.h"
 #include "openglobject.h"
+#include "objparser.h"
 
 GUI::GUI(EntityHandler* entityhandler, Simulator* sim) {
 }
@@ -15,11 +17,27 @@ void GUI::setup() {
 
     GLWidget* glCanvas = new GLWidget(window);
     glCanvas->setMinimumSize(768,480);
-    //glCanvas->resize(700,500);
-    glCanvas->draw();
 
-    //OpenGLObject* globj = new OpenGLObject;
-    //globj->draw(0,0,0);
+    OBJParser* parser = new OBJParser;
+
+    std::string rocket_file = "rocket.obj";
+
+
+    //glCanvas->resize(700,500);
+    glCanvas->beginDraw();
+    //glCanvas->draw();
+    //
+    //OpenGLObject* globj = new OpenGLObject(NULL);
+    OpenGLObject* globj = parser->parse(rocket_file);
+
+    if(!globj) {
+        printf("GICK EJ ATT LADDA\n");
+    }
+
+    globj->draw(0,0,0);
+
+    glCanvas->endDraw();
+
 
     QVBoxLayout* vlayout = new QVBoxLayout;
 

@@ -26,27 +26,27 @@ GLWidget::~GLWidget()
 }
 
 void GLWidget::beginDraw() {
-
-}
-
-void GLWidget::draw()
-{
     glMatrixMode(GL_PROJECTION);
-    glOrtho(-2.0, 2.0, -2.0, 2.0, 0.0, 3.0);
-    //glTranslatef(0,0,-4);
+    glOrtho(-2.0, 2.0, -2.0, 2.0, 0.0, 10);
 
     glMatrixMode(GL_MODELVIEW);
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
+}
 
+void GLWidget::endDraw() {
+    glFlush();
+}
+
+void GLWidget::draw()
+{
     glBegin(GL_TRIANGLES);
     glVertex3f(1.0f, 1.0f, 0.0f);
     glVertex3f(1, -1, 0.0f);
     glVertex3f(-1.0f, -1, 0.0f);
     glEnd();
 
-    glFlush();
 
     return;
 }
