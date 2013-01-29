@@ -30,7 +30,10 @@
 
 static GLDebugDrawer sDebugDrawer;
 
-CcdPhysicsDemo::CcdPhysicsDemo() : m_ccdMode(USE_CCD) {
+CcdPhysicsDemo::CcdPhysicsDemo() :
+    m_rocketMesh(nullptr),
+    m_ccdMode(USE_CCD)
+{
     setDebugMode(btIDebugDraw::DBG_DrawText + btIDebugDraw::DBG_NoHelpText);
     setCameraDistance(btScalar(20.));
 }
@@ -39,7 +42,7 @@ void CcdPhysicsDemo::clientMoveAndDisplay() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
     // simple dynamics world doesn't handle fixed-time-stepping
-    float ms = getDeltaTimeMicroseconds();
+    //float ms = getDeltaTimeMicroseconds();
  
     /// step the simulation
     if (m_dynamicsWorld) {
@@ -208,22 +211,81 @@ void CcdPhysicsDemo::initPhysics() {
         trans.setIdentity();
         btVector3 pos(0,10,-5);
         trans.setOrigin(pos);
-
-        btCollisionShape *sphereShape = new btSphereShape(1);
-        m_collisionShapes.push_back(sphereShape); // goes into index 3
-        btCollisionShape *coneShape = new btConeShape(.25,.5);
-        m_collisionShapes.push_back(coneShape); // goes into index 4
+        btQuaternion rot(0,0,1,1);
+        trans.setRotation(rot);
         
+
         btVector3 localInertia(0,0,0);
-        sphereShape->calculateLocalInertia(mass, localInertia);
-        coneShape->calculateLocalInertia(2.f, localInertia);
+        m_rocketMesh = new StlLoader("../models/object.stl");
+        btCollisionShape *rocketShape = new btBvhTriangleMeshShape(m_rocketMesh->getMesh(),
+                                                                   true);
+        btCompoundShape *compound = new btCompoundShape();
+        btTransform bodyTrans(btQuaternion(0,0,0), btVector3(-1.25,0,0));
+        compound->addChildShape(bodyTrans, rocketShape);
+
+        /// THIS IS FOR A CONVEX HULL
+        // btConvexShape* tmpConvexShape = new btConvexTriangleMeshShape(m_rocketMesh->getMesh());
+ 
+        // //create a hull approximation
+        // btShapeHull* hull = new btShapeHull(tmpConvexShape);
+        // btScalar margin = tmpConvexShape->getMargin();
+        // hull->buildHull(margin);
+        // tmpConvexShape->setUserPointer(hull);
+  
+        // printf("new numTriangles = %d\n", hull->numTriangles ());
+        // printf("new numIndices = %d\n", hull->numIndices ());
+        // printf("new numVertices = %d\n", hull->numVertices ());
+  
+        // btConvexHullShape* convexShape = new btConvexHullShape();
+        // for (int i=0;i<hull->numVertices();i++) {
+        //     convexShape->addPoint(hull->getVertexPointer()[i]); 
+        // }
+
+        // delete tmpConvexShape;
+        // delete hull;
+
+        // m_collisionShapes.push_back(convexShape);
+
+        // btTransform startTransform;
+        // startTransform.setIdentity();
+        // startTransform.setOrigin(btVector3(0,2,0));
+
+        // btRigidBody* body = localCreateRigidBody(mass, startTransform,convexShape);
+        // body->setRestitution(0.1);
+        // m_sphere = body;
+        ///////////////////// END CONVEX
+
+        /// THIS IS FOR A COMPOUND OBJECT        
+        // btCollisionShape *sphereShape = new btSphereShape(1);
+        // m_collisionShapes.push_back(sphereShape); // goes into index 3
+        // btCollisionShape *coneShape = new btConeShape(.25,.5);
+        // m_collisionShapes.push_back(coneShape); // goes into index 4
+        // sphereShape->calculateLocalInertia(mass, localInertia);
+        // coneShape->calculateLocalInertia(2.f, localInertia);
+        // btCompoundShape *rocketShape = new btCompoundShape();
+        // btTransform bodyTrans(btQuaternion(0,0,0), btVector3(0,0,0));
+        // rocketShape->addChildShape(bodyTrans, sphereShape);
+
+        // float z_offset = -0.7;
+        // btVector3 engineOffsets[4] = {{-1, z_offset,  0},
+        //                               { 1, z_offset,  0},
+        //                               { 0, z_offset, -1},
+        //                               { 0, z_offset,  1}};
+        // for (int i = 0; i != 4; ++i) {
+        //     btTransform engineTrans(btQuaternion(0,0,0), engineOffsets[i]);
+        //     rocketShape->addChildShape(engineTrans, coneShape);
+        // }
+        
+        compound->calculateLocalInertia(mass, localInertia);
+        
         btDefaultMotionState *myMotionState = new btDefaultMotionState(trans);
         btRigidBody::btRigidBodyConstructionInfo cInfo(mass, myMotionState,
-                                                       sphereShape, localInertia);
+                                                       //sphereShape, localInertia);
+                                                       compound, localInertia);
         btRigidBody *body = new btRigidBody(cInfo);
         m_sphere = body;
         body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
-        body->setRestitution(0.5);
+        body->setRestitution(0.1);
         m_dynamicsWorld->addRigidBody(body);
     }
 
@@ -362,5 +424,6 @@ void CcdPhysicsDemo::exitPhysics() {
     delete m_broadphase;
     delete m_dispatcher;
     delete m_collisionConfiguration;
+    delete m_rocketMesh;
 }
 
