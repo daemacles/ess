@@ -127,14 +127,16 @@ void CcdPhysicsDemo::initPhysics() {
     m_collisionConfiguration = new btDefaultCollisionConfiguration();
     // m_collisionConfiguration->setConvexConvexMultipointIterations();
 
-    /// use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
+    /// use the default collision dispatcher. For parallel processing you can
+    /// use a diffent dispatcher (see Extras/BulletMultiThreaded)
     m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
     m_dispatcher->registerCollisionCreateFunc(BOX_SHAPE_PROXYTYPE, BOX_SHAPE_PROXYTYPE,
          m_collisionConfiguration->getCollisionAlgorithmCreateFunc(CONVEX_SHAPE_PROXYTYPE,CONVEX_SHAPE_PROXYTYPE));
 
     m_broadphase = new btDbvtBroadphase();
 
-    /// the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
+    /// the default constraint solver. For parallel processing you can use a
+    /// different solver (see Extras/BulletMultiThreaded)
     btSequentialImpulseConstraintSolver* sol = new btSequentialImpulseConstraintSolver;
     m_solver = sol;
 
@@ -214,13 +216,13 @@ void CcdPhysicsDemo::initPhysics() {
         btQuaternion rot(0,0,1,1);
         trans.setRotation(rot);
         
-
-        btVector3 localInertia(0,0,0);
         m_rocketMesh = new StlLoader("../models/object.stl");
+        
+        btVector3 localInertia(0,0,0);
         btCollisionShape *rocketShape = new btBvhTriangleMeshShape(m_rocketMesh->getMesh(),
                                                                    true);
         btCompoundShape *compound = new btCompoundShape();
-        btTransform bodyTrans(btQuaternion(0,0,0), btVector3(-1.25,0,0));
+        btTransform bodyTrans(btQuaternion(0,0,0), btVector3(0,0,0));
         compound->addChildShape(bodyTrans, rocketShape);
 
         /// THIS IS FOR A CONVEX HULL
@@ -277,16 +279,17 @@ void CcdPhysicsDemo::initPhysics() {
         // }
         
         compound->calculateLocalInertia(mass, localInertia);
+        //rocketShape->calculateLocalInertia(mass, localInertia);
         
         btDefaultMotionState *myMotionState = new btDefaultMotionState(trans);
         btRigidBody::btRigidBodyConstructionInfo cInfo(mass, myMotionState,
-                                                       //sphereShape, localInertia);
+                                                       //rocketShape, localInertia);
                                                        compound, localInertia);
         btRigidBody *body = new btRigidBody(cInfo);
-        m_sphere = body;
         body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
-        body->setRestitution(0.1);
         m_dynamicsWorld->addRigidBody(body);
+        body->setRestitution(0.1);
+        m_sphere = body;
     }
 
     /*
