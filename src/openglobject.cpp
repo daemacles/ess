@@ -39,14 +39,9 @@ void OpenGLObject::draw(float x, float y, float z) {
     glTranslatef(x, y, z);
     glBegin(GL_TRIANGLES);
 
-    printf("%d\n", this->polygons.size());
-
-
-    printf("DARRRRRRRRw\n");
     for(int i = 0; i != this->polygons.size(); i++) {
         glVertex3f(this->polygons[i].x, this->polygons[i].y, this->polygons[i].z);
     }
-    printf("DONE\n");
 
     glEnd();
 

@@ -1,13 +1,13 @@
 #include <QtGui/QImage>
 #include <math.h>
 
-#include "glwidget.h"
+#include "glcanvas.h"
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D
 #endif
 
-    GLWidget::GLWidget(QWidget *parent)
+    GLCanvas::GLCanvas(QWidget *parent)
 : QGLWidget(QGLFormat(QGL::SampleBuffers|QGL::AlphaChannel), parent)
 {
     makeCurrent();
@@ -16,7 +16,7 @@
     return;
 }
 
-GLWidget::~GLWidget()
+GLCanvas::~GLCanvas()
 {
     delete[] wave;
     glDeleteLists(tile_list, 1);
@@ -25,7 +25,7 @@ GLWidget::~GLWidget()
         delete render_fbo;
 }
 
-void GLWidget::beginDraw() {
+void GLCanvas::beginDraw() {
 #define ZOOM_1 10.0
     glMatrixMode(GL_PROJECTION);
     glOrtho(-ZOOM_1, ZOOM_1, -ZOOM_1, ZOOM_1, 0.0, 10);
@@ -36,11 +36,11 @@ void GLWidget::beginDraw() {
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void GLWidget::endDraw() {
+void GLCanvas::endDraw() {
     glFlush();
 }
 
-void GLWidget::draw()
+void GLCanvas::draw()
 {
     glBegin(GL_TRIANGLES);
     glVertex3f(1.0f, 1.0f, 0.0f);
