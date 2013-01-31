@@ -26,8 +26,9 @@ GLWidget::~GLWidget()
 }
 
 void GLWidget::beginDraw() {
+#define ZOOM_1 10.0
     glMatrixMode(GL_PROJECTION);
-    glOrtho(-2.0, 2.0, -2.0, 2.0, 0.0, 10);
+    glOrtho(-ZOOM_1, ZOOM_1, -ZOOM_1, ZOOM_1, 0.0, 10);
 
     glMatrixMode(GL_MODELVIEW);
 

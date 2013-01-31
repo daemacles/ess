@@ -22,7 +22,7 @@ void GUI::setup() {
     QWidget* window = this;
 
     GLWidget* glCanvas = new GLWidget(window);
-    glCanvas->setMinimumSize(768,480);
+    glCanvas->setMinimumSize(1024,480);
 
 
     //glCanvas->resize(700,500);
