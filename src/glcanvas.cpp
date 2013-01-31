@@ -7,12 +7,13 @@
 #define GL_MULTISAMPLE  0x809D
 #endif
 
-    GLCanvas::GLCanvas(QWidget *parent)
-: QGLWidget(QGLFormat(QGL::SampleBuffers|QGL::AlphaChannel), parent)
+GLCanvas::GLCanvas(QWidget *parent):
+    QGLWidget(QGLFormat(QGL::SampleBuffers|QGL::AlphaChannel), parent)
 {
     makeCurrent();
-    glViewport(0,0,768,480);
+    glViewport(0, 0, GL_WIDTH, GL_HEIGHT);
     QPainter p(this);
+
     return;
 }
 

@@ -6,6 +6,12 @@
 #include <QTimeLine>
 #include <QSvgRenderer>
 
+#define GL_WIDTH 1024
+#define GL_HEIGHT 480
+
+/*
+ * This class represents the actual OpenGL "window" that is shown in the GUI.
+ */
 class GLCanvas : public QGLWidget
 {
     Q_OBJECT
