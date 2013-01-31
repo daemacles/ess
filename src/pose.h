@@ -1,3 +1,7 @@
+struct vec3 {
+    float x, y, z;
+};
+
 class Pose {
     public:
         vec3 pos;

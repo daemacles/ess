@@ -4,11 +4,16 @@
 #include <string>
 
 #include "gui.h"
+#include "entityhandler.h"
 #include "glwidget.h"
 #include "openglobject.h"
-#include "objparser.h"
+
+void draw_entity_openglob(Entity* e) {
+    e->getOpenGLObject()->draw(0,0,0);
+}
 
 GUI::GUI(EntityHandler* entityhandler, Simulator* sim) {
+    this->entityHandler = new EntityHandler();
 }
 
 void GUI::setup() {
@@ -18,23 +23,17 @@ void GUI::setup() {
     GLWidget* glCanvas = new GLWidget(window);
     glCanvas->setMinimumSize(768,480);
 
-    OBJParser* parser = new OBJParser;
-
-    std::string rocket_file = "rocket.obj";
-
 
     //glCanvas->resize(700,500);
     glCanvas->beginDraw();
     //glCanvas->draw();
     //
     //OpenGLObject* globj = new OpenGLObject(NULL);
-    OpenGLObject* globj = parser->parse(rocket_file);
+    //
 
-    if(!globj) {
-        printf("GICK EJ ATT LADDA\n");
-    }
+    this->entityHandler->getEntities()[0]->getOpenGLObject()->draw(0,0,0);
 
-    globj->draw(0,0,0);
+    //globj->draw(0,0,0);
 
     glCanvas->endDraw();
 
