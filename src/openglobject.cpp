@@ -35,9 +35,12 @@ OpenGLObject::OpenGLObject(std::vector<polygon> polygons) {
 
 void OpenGLObject::draw(float x, float y, float z) {
 
+    glPushMatrix();
+    glTranslatef(x, y, z);
     glBegin(GL_TRIANGLES);
 
     printf("%d\n", this->polygons.size());
+
 
     printf("DARRRRRRRRw\n");
     for(int i = 0; i != this->polygons.size(); i++) {
@@ -46,6 +49,8 @@ void OpenGLObject::draw(float x, float y, float z) {
     printf("DONE\n");
 
     glEnd();
+
+    glPopMatrix();
 
     /*
     glClearColor(1.0, 1.0, 0.0, 1.0);

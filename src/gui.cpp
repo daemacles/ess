@@ -9,7 +9,8 @@
 #include "openglobject.h"
 
 void draw_entity_openglob(Entity* e) {
-    e->getOpenGLObject()->draw(0,0,0);
+    Pose* pose = e->getPose();
+    e->getOpenGLObject()->draw(pose->pos.x, pose->pos.y, pose->pos.z);
 }
 
 GUI::GUI(EntityHandler* entityhandler, Simulator* sim) {
@@ -31,7 +32,8 @@ void GUI::setup() {
     //OpenGLObject* globj = new OpenGLObject(NULL);
     //
 
-    this->entityHandler->getEntities()[0]->getOpenGLObject()->draw(0,0,0);
+    draw_entity_openglob(this->entityHandler->getEntities()[0]);
+    //this->entityHandler->getEntities()[0]->getOpenGLObject()->draw(0,0,0);
 
     //globj->draw(0,0,0);
 

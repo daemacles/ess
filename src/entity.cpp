@@ -8,3 +8,7 @@ Entity::Entity(OpenGLObject* openglobj, Pose* pose) {
 OpenGLObject* Entity::getOpenGLObject() {
     return this->openglobj;
 }
+
+Pose* Entity::getPose() {
+    return this->pose;
+}

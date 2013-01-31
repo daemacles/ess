@@ -15,7 +15,12 @@ EntityHandler::EntityHandler() {
         printf("GICK EJ ATT LADDA\n");
     }
 
-    Entity* e = new Entity(globj, NULL);
+    Pose* p = new Pose;
+    p->pos.x = -2;
+    p->pos.y = -0.5;
+    p->pos.z = 0;
+
+    Entity* e = new Entity(globj, p);
 
     this->entities.push_back(e);
 }

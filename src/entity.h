@@ -12,6 +12,7 @@ class Entity {
     public:
         Entity(OpenGLObject* openglobj, Pose* pose);
         OpenGLObject* getOpenGLObject();
+        Pose* getPose();
 };
 
 #endif
