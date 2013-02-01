@@ -12,11 +12,14 @@ class Entity {
     private:
     Pose pose;
     btRigidBody *physObject;    // Handle to this entity in bullet
-    OpenGLObject *openglobj;
+    OpenGLObject *openglObject;
+
     public:
     Entity (btRigidBody *body=nullptr, 
-            OpenGLObject *oglobj=nullptr): physObject(body) {};
+            OpenGLObject *oglobj=nullptr);
     OpenGLObject* getOpenGLObject();
-	Pose* getPose();
+    Pose& getPose();
     void update (void);
 };
+
+#endif

@@ -8,15 +8,6 @@ void simCallback(btDynamicsWorld *world, btScalar timeStep) {
     sim->callback(timeStep);
 }
 
-Simulator::Simulator() {
-    this->sensors.push_back(new Sensor);
-    this->sensors.push_back(new Sensor);
-}
-
 void Simulator::callback (btScalar timeStep) {
     entities->callUpdates();
-}
-
-std::vector<Sensor*> Simulator::getSensors() { 
-    return this->sensors;
 }

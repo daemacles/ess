@@ -1,8 +1,9 @@
 CC = g++-4.7
-CFLAGS = $(OPTIMIZE) -std=c++11 -Wall -g -I. -I../src $(shell pkg-config bullet --cflags)
+CFLAGS = $(OPTIMIZE) -std=c++11 -Wall -g -I. -I../src \
+         $(shell pkg-config bullet --cflags)
 CLIBS = -L. -lOpenGLSupport $(shell pkg-config bullet --libs) \
         -lm -lGL -lGLU -lglut 
-OBJS =  main.o \
+OBJS =  phys_main.o \
 	CcdPhysicsDemo.o \
 	StlLoader.o \
 	simulator.o \
@@ -11,9 +12,10 @@ OBJS =  main.o \
 	pose.o \
 	sensor.o
 
-EXE = demo
+EXE = phys_demo
 
 all: $(EXE)
+	global -u # run incremental update
 
 run: $(EXE)
 	./$(EXE)

@@ -15,10 +15,14 @@ class EntityHandler {
     std::map<std::string, Entity*> dynamicEnts;
     std::map<std::string, Entity*> staticEnts;
     std::map<std::string, Sensor*> sensors;
+
+    EntityHandler ();
+    virtual ~EntityHandler ();
     
     void addDynamic (std::string name, Entity* e) { dynamicEnts[name] = e; }
     void addStatic  (std::string name, Entity* e) { staticEnts[name] = e; }
     void addSensor  (std::string name, Sensor* e) { sensors[name] = e; }
+
     void callUpdates (void);
 };
 

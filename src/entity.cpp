@@ -1,8 +1,10 @@
 #include "entity.h"
 
-Entity::Entity(OpenGLObject* openglobj, Pose* pose) {
-    this->openglobj = openglobj;
-    this->pose = pose;
+Entity::Entity (btRigidBody *body, OpenGLObject *oglobj):
+    physObject(body),
+    openglObject(oglobj)
+{
+    // TODO?
 }
 
 void Entity::update (void) {
@@ -12,9 +14,9 @@ void Entity::update (void) {
 }
 
 OpenGLObject* Entity::getOpenGLObject() {
-    return this->openglobj;
+    return this->openglObject;
 }
 
-Pose* Entity::getPose() {
-    return this->pose;
+Pose& Entity::getPose() {
+    return pose;
 }
