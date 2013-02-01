@@ -1,6 +1,8 @@
 #ifndef _SENSOR_H
 #define _SENSOR_H
 
+#include <string>
+
 #include "btBulletDynamicsCommon.h"
 
 class Sensor {
@@ -8,7 +10,8 @@ class Sensor {
     
 
     public:
-    virtual void update() = 0;
+    float getValue();
+    std::string getName();
 };
 
 #endif

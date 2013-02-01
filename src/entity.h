@@ -5,16 +5,18 @@
 
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 
+#include "openglobject.h"
 #include "pose.h"
 
 class Entity {
     private:
     Pose pose;
     btRigidBody *physObject;    // Handle to this entity in bullet
-    
+    OpenGLObject *openglobj;
     public:
-    Entity (btRigidBody *body=nullptr): physObject(body) {};
+    Entity (btRigidBody *body=nullptr, 
+            OpenGLObject *oglobj=nullptr): physObject(body) {};
+    OpenGLObject* getOpenGLObject();
+	Pose* getPose();
     void update (void);
 };
-
-#endif

@@ -1,62 +1,88 @@
+#include "gui.h"
+
 #include <QLabel>
 #include <QFrame>
 #include <QDesktopWidget>
 #include <string>
+#include <math.h>
+#include <time.h>
+#include <iostream>
+#include <sstream>
 
-#include "gui.h"
-#include "glwidget.h"
+#include "entityhandler.h"
+#include "glcanvas.h"
 #include "openglobject.h"
-#include "objparser.h"
+
+float ff = 0.0;
+
+void draw_entity_openglob(Entity* e) {
+    Pose* pose = e->getPose();
+    e->getOpenGLObject()->draw(sin(ff), 0, 0);
+    ff += 0.05;
+    //e->getOpenGLObject()->draw(pose->pos.x, pose->pos.y, pose->pos.z);
+}
 
 GUI::GUI(EntityHandler* entityhandler, Simulator* sim) {
+    this->entityHandler = new EntityHandler();
+    this->simulator = sim;
+}
+
+QWidget* GUI::setupSensors() {
+    QWidget* sensorList = new QWidget;
+    QVBoxLayout* sensorListLayout = new QVBoxLayout;
+    sensorList->setLayout(sensorListLayout);
+    sensorListLayout->addWidget(new QLabel("Sensors"));
+
+    std::vector<Sensor*> sim_sensors = this->simulator->getSensors();
+
+    for(std::vector<Sensor*>::iterator it = sim_sensors.begin(); it != sim_sensors.end(); ++it) {
+        Sensor* s = *it;
+        QWidget* sensorRow = new QWidget;
+        QHBoxLayout* sensorRowLayout = new QHBoxLayout;
+        sensorRow->setLayout(sensorRowLayout);
+
+        std::ostringstream buff;
+        buff << s->getValue();
+        QLabel* sensorValueLabel = new QLabel(buff.str().c_str());
+
+        sensorRowLayout->addWidget(new QLabel(s->getName().c_str()));
+        sensorRowLayout->addWidget(sensorValueLabel);
+
+        sensorListLayout->addWidget(sensorRow);
+    }
+
+    return sensorList;
 }
 
 void GUI::setup() {
-
     QWidget* window = this;
 
-    GLWidget* glCanvas = new GLWidget(window);
-    glCanvas->setMinimumSize(768,480);
+    // GL screen widget
+    this->glCanvas = new GLCanvas(window);
+    this->glCanvas->setMinimumSize(1024,480);
+    this->glCanvas->beginDraw();
 
-    OBJParser* parser = new OBJParser;
+    // Set up timer to update GL screen
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(draw()));
+    timer->start(1);
 
-    std::string rocket_file = "rocket.obj";
-
-
-    //glCanvas->resize(700,500);
-    glCanvas->beginDraw();
-    //glCanvas->draw();
-    //
-    //OpenGLObject* globj = new OpenGLObject(NULL);
-    OpenGLObject* globj = parser->parse(rocket_file);
-
-    if(!globj) {
-        printf("GICK EJ ATT LADDA\n");
-    }
-
-    globj->draw(0,0,0);
-
-    glCanvas->endDraw();
-
-
-    QVBoxLayout* vlayout = new QVBoxLayout;
-
-    QWidget* buttonRow = new QWidget;
+    QWidget* sensorList = this->setupSensors();
 
     QPushButton *resetButton = new QPushButton("Reset");
-    QPushButton *button1= new QPushButton("Reset");
-    QPushButton *button2= new QPushButton("Reset");
     QPushButton *button3= new QPushButton("Reset");
     QPushButton *button4= new QPushButton("Reset");
 
-    vlayout->addWidget(glCanvas);
+    QVBoxLayout* vlayout = new QVBoxLayout;
+    QWidget* buttonRow = new QWidget;
+
+    vlayout->addWidget(this->glCanvas);
     vlayout->addWidget(buttonRow);
 
     QHBoxLayout* buttonRowLayout = new QHBoxLayout;
 
+    buttonRowLayout->addWidget(sensorList);
     buttonRowLayout->addWidget(resetButton);
-    buttonRowLayout->addWidget(button1);
-    buttonRowLayout->addWidget(button2);
     buttonRowLayout->addWidget(button3);
     buttonRowLayout->addWidget(button4);
     buttonRow->setLayout(buttonRowLayout);
@@ -67,4 +93,20 @@ void GUI::setup() {
 
 void GUI::draw() {
 
+    //glCanvas->resize(700,500);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+    //glCanvas->draw();
+    //
+    //OpenGLObject* globj = new OpenGLObject(NULL);
+    //
+
+    draw_entity_openglob(this->entityHandler->getEntities()[0]);
+    //this->entityHandler->getEntities()[0]->getOpenGLObject()->draw(0,0,0);
+
+    //globj->draw(0,0,0);
+
+    this->glCanvas->endDraw();
+
+    this->glCanvas->updateGL();
 }

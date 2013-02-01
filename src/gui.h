@@ -1,15 +1,23 @@
 #include <QDesktopWidget>
+#include <unordered_map>
 
 #include "entityhandler.h"
 #include "simulator.h"
+#include "glcanvas.h"
 
 class GUI: public QWidget {
     private:
+        Q_OBJECT
         EntityHandler* entityHandler;
-        Simulator* sim;
+        Simulator* simulator;
+        GLCanvas* glCanvas;
+        std::unordered_map<Sensor*, QLabel*> sensorLabelMap;
+        QWidget* setupSensors();
 
     public:
         GUI(EntityHandler* entityhandler, Simulator* sim);
         void setup();
-        void draw();
+
+        public slots:
+            void draw();
 };

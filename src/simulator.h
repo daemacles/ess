@@ -6,7 +6,6 @@
 #include "entityhandler.h"
 
 void simCallback(btDynamicsWorld *world, btScalar timeStep);
-
 class Simulator {
     private:
     EntityHandler *entities;
@@ -15,5 +14,4 @@ class Simulator {
     Simulator (EntityHandler *_ents): entities(_ents) {};
     void callback (btScalar timeStep);
 };
-
 #endif

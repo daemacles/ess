@@ -1,15 +1,24 @@
+#ifndef _GLCANVAS_H_
+#define _GLCANVAS_H_
+
 #include <QtOpenGL>
 #include <QImage>
 #include <QTimeLine>
 #include <QSvgRenderer>
 
-class GLWidget : public QGLWidget
+#define GL_WIDTH 1024
+#define GL_HEIGHT 480
+
+/*
+ * This class represents the actual OpenGL "window" that is shown in the GUI.
+ */
+class GLCanvas : public QGLWidget
 {
     Q_OBJECT
 
     public:
-        GLWidget(QWidget *parent);
-        ~GLWidget();
+        GLCanvas(QWidget *parent);
+        ~GLCanvas();
 
         void saveGLState();
         void restoreGLState();
@@ -32,3 +41,5 @@ class GLWidget : public QGLWidget
         QGLFramebufferObject *render_fbo;
         QGLFramebufferObject *texture_fbo;
 };
+
+#endif
