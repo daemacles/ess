@@ -10,11 +10,11 @@ struct polygon {
 
 class OpenGLObject {
     private:
-        std::vector<polygon> polygons;
-
+    std::vector<polygon> polygons;
+    
     public:
-        void draw(float x, float y, float z);
-        OpenGLObject(std::vector<polygon> polygons);
+    void draw(float x, float y, float z);
+    OpenGLObject(std::vector<polygon> polygons);
 };
 
 #endif

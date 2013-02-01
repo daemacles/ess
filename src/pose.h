@@ -1,3 +1,8 @@
+
+#include "btBulletDynamicsCommon.h"
+
+typedef btVector3 vec3;
+
 class Pose {
     public:
         vec3 pos;

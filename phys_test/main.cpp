@@ -21,15 +21,22 @@
 #include "GlutStuff.h"
 #include "GLDebugDrawer.h"
 
+#include "simulator.h"
+
 GLDebugDrawer	gDebugDrawer;
 
 int main(int argc,char** argv)
 {
     CcdPhysicsDemo* ccdDemo = new CcdPhysicsDemo();
-
     ccdDemo->initPhysics();
     ccdDemo->getDynamicsWorld()->setDebugDrawer(&gDebugDrawer);
 
+    EntityHandler entities;
+    Simulator sim(&entities);
+    
+    btDynamicsWorld *world = ccdDemo->getDynamicsWorld();
+    world->setInternalTickCallback(simCallback, static_cast<void*>(&sim));
+    
     glutmain(argc, argv, 640, 480,
              "Bullet Physics Demo. http://bulletphysics.com", ccdDemo);
 

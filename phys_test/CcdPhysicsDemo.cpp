@@ -20,6 +20,8 @@
 #include <btBulletDynamicsCommon.h> // main Bullet include file, contains most
                                     // common include files.
 
+#include <BulletCollision/Gimpact/btGImpactShape.h>
+
 #include "CcdPhysicsDemo.h"
 #include "GlutStuff.h"
 #include "GLDebugFont.h"
@@ -57,6 +59,28 @@ void CcdPhysicsDemo::clientMoveAndDisplay() {
     swapBuffers();
 }
 
+void myCallback(btDynamicsWorld *world, btScalar timeStep) {
+    CcdPhysicsDemo *d = static_cast<CcdPhysicsDemo *>(world->getWorldUserInfo());
+    d->callback(timeStep);
+}
+void CcdPhysicsDemo::callback(btScalar timeStep) {
+    // Bouncing rocket
+    float height = 5.0f;
+    float maxThrust = 20.0f;
+    m_rocket->setActivationState(ACTIVE_TAG);
+    auto ori = m_rocket->getOrientation();
+    auto trans = m_rocket->getWorldTransform().getOrigin();
+    float error = height - trans[1];
+    if (error < 0) error = 0.0f;
+    float impulseStrength = 5.0f * error;
+    if (impulseStrength > maxThrust) impulseStrength = maxThrust;
+    btVector3 thrust(0,1,0);
+    btVector3 impulse = thrust.rotate(ori.getAxis(), ori.getAngle());
+    impulse *= impulseStrength;
+    btVector3 relPos(0,0,0);
+    m_rocket->applyImpulse(impulse,relPos);
+}
+
 
 void CcdPhysicsDemo::displayText() {
     int lineWidth = 440;
@@ -83,20 +107,23 @@ void CcdPhysicsDemo::displayText() {
             sprintf(buf,"unknown CCD setting");
         };
         };
+        GLDebugDrawString(xStart, yStart, buf);
 
-        GLDebugDrawString(xStart,20,buf);
+        yStart += 20;
         glRasterPos3f(xStart, yStart, 0);
         sprintf(buf,"Press 'p' to change CCD mode");
-        yStart+=20;
         GLDebugDrawString(xStart,yStart,buf);
-        glRasterPos3f(xStart, yStart, 0);
-        sprintf(buf,"Press '.' or right mouse to shoot bullets");
-        yStart+=20;
-        GLDebugDrawString(xStart,yStart,buf);
-        glRasterPos3f(xStart, yStart, 0);
-        sprintf(buf,"space to restart, h(elp), t(ext), w(ire)");
-        yStart+=20;
-        GLDebugDrawString(xStart,yStart,buf);
+
+        if (m_rocket) {
+            yStart += 20;
+            glRasterPos3f(xStart, yStart, 0);
+            auto ori = m_rocket->getOrientation();
+            auto axis = ori.getAxis();
+            auto angle = ori.getAngle();
+            sprintf(buf, "Orientation: (%2.2f, %2.2f, %2.2f) %2.2f", axis.x(), axis.y(), axis.z(),
+                    angle);
+            GLDebugDrawString(xStart, yStart, buf);
+        }
   
         resetPerspectiveProjection();
         glEnable(GL_LIGHTING);
@@ -125,13 +152,13 @@ void CcdPhysicsDemo::initPhysics() {
 
     /// collision configuration contains default setup for memory, collision setup
     m_collisionConfiguration = new btDefaultCollisionConfiguration();
-    // m_collisionConfiguration->setConvexConvexMultipointIterations();
 
     /// use the default collision dispatcher. For parallel processing you can
     /// use a diffent dispatcher (see Extras/BulletMultiThreaded)
     m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
     m_dispatcher->registerCollisionCreateFunc(BOX_SHAPE_PROXYTYPE, BOX_SHAPE_PROXYTYPE,
-         m_collisionConfiguration->getCollisionAlgorithmCreateFunc(CONVEX_SHAPE_PROXYTYPE,CONVEX_SHAPE_PROXYTYPE));
+         m_collisionConfiguration->getCollisionAlgorithmCreateFunc(CONVEX_SHAPE_PROXYTYPE,
+                                                                   CONVEX_SHAPE_PROXYTYPE));
 
     m_broadphase = new btDbvtBroadphase();
 
@@ -140,49 +167,36 @@ void CcdPhysicsDemo::initPhysics() {
     btSequentialImpulseConstraintSolver* sol = new btSequentialImpulseConstraintSolver;
     m_solver = sol;
 
-    m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher,m_broadphase,m_solver,m_collisionConfiguration);
+    m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase,
+                                                  m_solver,m_collisionConfiguration);
     m_dynamicsWorld->setDebugDrawer(&sDebugDrawer);
     m_dynamicsWorld->getSolverInfo().m_splitImpulse=true;
     m_dynamicsWorld->getSolverInfo().m_numIterations = 20;
-
-    if (m_ccdMode==USE_CCD) {
-        m_dynamicsWorld->getDispatchInfo().m_useContinuous=true;
-    } else {
-        m_dynamicsWorld->getDispatchInfo().m_useContinuous=false;
-    }
-
+    m_dynamicsWorld->getDispatchInfo().m_useContinuous = m_ccdMode == USE_CCD;
     m_dynamicsWorld->setGravity(btVector3(0,-10,0));
 
     /// create a few basic rigid bodies
-    btBoxShape* box = new btBoxShape(btVector3(btScalar(110.),btScalar(1.),btScalar(110.)));
-    // box->initializePolyhedralFeatures();
+    btBoxShape* box = new btBoxShape(btVector3(btScalar(110.), btScalar(1.), btScalar(110.)));
     btCollisionShape* groundShape = box;
 
-    // btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0,1,0),50);
- 
     m_collisionShapes.push_back(groundShape);
-    m_collisionShapes.push_back(new btCylinderShape (btVector3(CUBE_HALF_EXTENTS,CUBE_HALF_EXTENTS,CUBE_HALF_EXTENTS)));
 
-    btTransform groundTransform;
-    groundTransform.setIdentity();
-    // groundTransform.setOrigin(btVector3(5,5,5));
 
+    btVector3 localInertia(0,0,0);
+    
     // We can also use DemoApplication::localCreateRigidBody, but for clarity
     // it is provided here:
     {
         btScalar mass(0.);
 
-        // rigidbody is dynamic if and only if mass is non zero, otherwise static
-        bool isDynamic = (mass != 0.f);
-
-        btVector3 localInertia(0,0,0);
-        if (isDynamic)
-            groundShape->calculateLocalInertia(mass,localInertia);
-
+        btTransform groundTransform;
+        groundTransform.setIdentity();
+        
         // using motionstate is recommended, it provides interpolation
         // capabilities, and only synchronizes 'active' objects
         btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
-        btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,groundShape,localInertia);
+        btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState,
+                                                        groundShape,localInertia);
         btRigidBody* body = new btRigidBody(rbInfo);
         body->setRestitution(.8);
 
@@ -192,145 +206,33 @@ void CcdPhysicsDemo::initPhysics() {
 
     btCollisionShape* boxShape = new btBoxShape(btVector3(1,1,1));
     m_collisionShapes.push_back(boxShape);
+    boxShape->calculateLocalInertia(1.0f, localInertia);
 
     ///  Create Dynamic Objects
-    btTransform startTransform;
-    startTransform.setIdentity();
-
-    btScalar mass(1.f);
-
-    // rigidbody is dynamic if and only if mass is non zero, otherwise static
-    bool isDynamic = (mass != 0.f);
-
-    btVector3 localInertia(0,0,0);
-    if (isDynamic)
-        boxShape->calculateLocalInertia(mass,localInertia);
-
-
     {
         btScalar mass{5.f};
-        btTransform trans;
-        trans.setIdentity();
-        btVector3 pos(0,10,-5);
-        trans.setOrigin(pos);
-        btQuaternion rot(0,0,1,1);
-        trans.setRotation(rot);
-        
         m_rocketMesh = new StlLoader("../models/object.stl");
         
         btVector3 localInertia(0,0,0);
-        btCollisionShape *rocketShape = new btBvhTriangleMeshShape(m_rocketMesh->getMesh(),
-                                                                   true);
-        btCompoundShape *compound = new btCompoundShape();
-        btTransform bodyTrans(btQuaternion(0,0,0), btVector3(0,0,0));
-        compound->addChildShape(bodyTrans, rocketShape);
-
-        /// THIS IS FOR A CONVEX HULL
-        // btConvexShape* tmpConvexShape = new btConvexTriangleMeshShape(m_rocketMesh->getMesh());
- 
-        // //create a hull approximation
-        // btShapeHull* hull = new btShapeHull(tmpConvexShape);
-        // btScalar margin = tmpConvexShape->getMargin();
-        // hull->buildHull(margin);
-        // tmpConvexShape->setUserPointer(hull);
-  
-        // printf("new numTriangles = %d\n", hull->numTriangles ());
-        // printf("new numIndices = %d\n", hull->numIndices ());
-        // printf("new numVertices = %d\n", hull->numVertices ());
-  
-        // btConvexHullShape* convexShape = new btConvexHullShape();
-        // for (int i=0;i<hull->numVertices();i++) {
-        //     convexShape->addPoint(hull->getVertexPointer()[i]); 
-        // }
-
-        // delete tmpConvexShape;
-        // delete hull;
-
-        // m_collisionShapes.push_back(convexShape);
-
-        // btTransform startTransform;
-        // startTransform.setIdentity();
-        // startTransform.setOrigin(btVector3(0,2,0));
-
-        // btRigidBody* body = localCreateRigidBody(mass, startTransform,convexShape);
-        // body->setRestitution(0.1);
-        // m_sphere = body;
-        ///////////////////// END CONVEX
-
-        /// THIS IS FOR A COMPOUND OBJECT        
-        // btCollisionShape *sphereShape = new btSphereShape(1);
-        // m_collisionShapes.push_back(sphereShape); // goes into index 3
-        // btCollisionShape *coneShape = new btConeShape(.25,.5);
-        // m_collisionShapes.push_back(coneShape); // goes into index 4
-        // sphereShape->calculateLocalInertia(mass, localInertia);
-        // coneShape->calculateLocalInertia(2.f, localInertia);
-        // btCompoundShape *rocketShape = new btCompoundShape();
-        // btTransform bodyTrans(btQuaternion(0,0,0), btVector3(0,0,0));
-        // rocketShape->addChildShape(bodyTrans, sphereShape);
-
-        // float z_offset = -0.7;
-        // btVector3 engineOffsets[4] = {{-1, z_offset,  0},
-        //                               { 1, z_offset,  0},
-        //                               { 0, z_offset, -1},
-        //                               { 0, z_offset,  1}};
-        // for (int i = 0; i != 4; ++i) {
-        //     btTransform engineTrans(btQuaternion(0,0,0), engineOffsets[i]);
-        //     rocketShape->addChildShape(engineTrans, coneShape);
-        // }
+        btGImpactMeshShape *rocketShape = new btGImpactMeshShape(m_rocketMesh->getMesh());
+        rocketShape->updateBound();
+        rocketShape->calculateLocalInertia(mass, localInertia);
         
-        compound->calculateLocalInertia(mass, localInertia);
-        //rocketShape->calculateLocalInertia(mass, localInertia);
-        
+        btVector3 pos(0,10,-5);
+        btQuaternion rot(0,0,0,1);
+        btTransform trans;
+        trans.setIdentity();
+        trans.setOrigin(pos);
+        //trans.setRotation(rot);
         btDefaultMotionState *myMotionState = new btDefaultMotionState(trans);
         btRigidBody::btRigidBodyConstructionInfo cInfo(mass, myMotionState,
-                                                       //rocketShape, localInertia);
-                                                       compound, localInertia);
+                                                       rocketShape, localInertia);
         btRigidBody *body = new btRigidBody(cInfo);
         body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
         m_dynamicsWorld->addRigidBody(body);
         body->setRestitution(0.1);
-        m_sphere = body;
+        m_rocket = body;
     }
-
-    /*
-    {
-        // create a few dynamic rigidbodies
-        // Re-using the same collision is better for memory usage and performance
-        int gNumObjects = 120;
-        for (int i=0; i != gNumObjects; ++i) {
-            btCollisionShape* shape = m_collisionShapes[1];
-   
-            btTransform trans;
-            trans.setIdentity();
-
-            // stack them
-            int colsize = 10;
-            int row = (i*CUBE_HALF_EXTENTS*2)/(colsize*2*CUBE_HALF_EXTENTS);
-            int row2 = row;
-            int col = (i)%(colsize)-colsize/2;
-
-            if (col>3) {
-                col=11;
-                row2 |=1;
-            }
-
-            btVector3 pos(col*2*CUBE_HALF_EXTENTS + (row2%2)*CUBE_HALF_EXTENTS,
-                          row*2*CUBE_HALF_EXTENTS+CUBE_HALF_EXTENTS+EXTRA_HEIGHT,
-                          0);
-            trans.setOrigin(pos);
- 
-            float mass = 1.f;
-            btRigidBody* body = localCreateRigidBody(mass,trans,shape);
-            body->setRestitution(.8);
- 
-            /// when using m_ccdMode
-            if (m_ccdMode==USE_CCD) {
-                body->setCcdMotionThreshold(CUBE_HALF_EXTENTS);
-                body->setCcdSweptSphereRadius(0.9*CUBE_HALF_EXTENTS);
-            }
-        }
-    }
-    */
 }
 
 void CcdPhysicsDemo::clientResetScene() {
@@ -352,14 +254,17 @@ void CcdPhysicsDemo::keyboardCallback(unsigned char key, int x, int y) {
         };
         clientResetScene();
     } else if (key == 'w') {
-        m_sphere->setActivationState(ACTIVE_TAG);
-        btVector3 impulse = btVector3(0,1,0);
-        impulse.normalize();
-        float impulseStrength = 50.f;
+        m_rocket->setActivationState(ACTIVE_TAG);
+        //btVector3 impulse = m_rocket->getWorldTransform().getOrigin();
+        auto ori = m_rocket->getOrientation();
+        
+        btVector3 thrust(0,1,0);
+        btVector3 impulse = thrust.rotate(ori.getAxis(), ori.getAngle());
+        float impulseStrength = 40.f;
         impulse *= impulseStrength;
-        btVector3 relPos(0,0,0);//m_sphere->getCenterOfMassPosition();
-        relPos[1] -= 10;
-        m_sphere->applyImpulse(impulse,relPos);
+        btVector3 relPos(0,0,0);//m_rocket->getCenterOfMassPosition();
+        //relPos[1] -= 10;
+        m_rocket->applyImpulse(impulse,relPos);
     } else {
         DemoApplication::keyboardCallback(key,x,y);
     }

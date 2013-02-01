@@ -44,7 +44,7 @@ class CcdPhysicsDemo : public PlatformDemoApplication
     btCollisionDispatcher	           *m_dispatcher;
     btConstraintSolver	                   *m_solver;
     btDefaultCollisionConfiguration        *m_collisionConfiguration;
-    btRigidBody                            *m_sphere;
+    btRigidBody                            *m_rocket;
     StlLoader                              *m_rocketMesh;
 
     enum { USE_CCD=1,
@@ -66,7 +66,9 @@ class CcdPhysicsDemo : public PlatformDemoApplication
     virtual void displayCallback();
     virtual void shootBox(const btVector3& destination);
     virtual void clientResetScene();
-	
+
+    void callback (btScalar timeStep);
+    
     static DemoApplication* Create()
     {
         CcdPhysicsDemo* demo = new CcdPhysicsDemo;

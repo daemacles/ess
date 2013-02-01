@@ -1,8 +1,16 @@
 CC = g++-4.7
-CFLAGS = $(OPTIMIZE) -std=c++11 -Wall -g -I. $(shell pkg-config bullet --cflags)
+CFLAGS = $(OPTIMIZE) -std=c++11 -Wall -g -I. -I../src $(shell pkg-config bullet --cflags)
 CLIBS = -L. -lOpenGLSupport $(shell pkg-config bullet --libs) \
         -lm -lGL -lGLU -lglut 
-OBJS = main.o CcdPhysicsDemo.o StlLoader.o
+OBJS =  main.o \
+	CcdPhysicsDemo.o \
+	StlLoader.o \
+	simulator.o \
+	entityhandler.o \
+	entity.o \
+	pose.o \
+	sensor.o
+
 EXE = demo
 
 all: $(EXE)
@@ -10,13 +18,14 @@ all: $(EXE)
 run: $(EXE)
 	./$(EXE)
 
-main.o: main.cpp *.h
-	$(CC) $(CFLAGS) -c $<
+%.P: %.cpp
+	$(MAKEDEPEND)
+	@sed 's/\($*\)\.o[ :]*/\1.o $@ : /g' < $*.d > $@; \
+             rm -f $*.d; [ -s $@ ] || rm -f $@
 
-CcdPhysicsDemo.o: CcdPhysicsDemo.cpp *.h
-	$(CC) $(CFLAGS) -c $<
+include $(SRCS.cpp=.P)
 
-StlLoader.o: StlLoader.cpp StlLoader.h
+%.o: %.cpp
 	$(CC) $(CFLAGS) -c $<
 
 $(EXE): $(OBJS)
