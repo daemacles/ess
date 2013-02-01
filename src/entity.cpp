@@ -5,6 +5,12 @@ Entity::Entity(OpenGLObject* openglobj, Pose* pose) {
     this->pose = pose;
 }
 
+void Entity::update (void) {
+    if (physObject) {
+        printf("I got updated!");
+    }
+}
+
 OpenGLObject* Entity::getOpenGLObject() {
     return this->openglobj;
 }

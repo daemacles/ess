@@ -13,7 +13,6 @@ EntityHandler::EntityHandler() {
 
     if(!globj) {
         printf("GICK EJ ATT LADDA\n");
-    }
 
     Pose* p = new Pose;
     p->pos.x = -2;
@@ -23,6 +22,13 @@ EntityHandler::EntityHandler() {
     Entity* e = new Entity(globj, p);
 
     this->entities.push_back(e);
+}
+
+void EntityHandler::callUpdates (void) {
+    for (auto p : dynamicEnts) {
+        auto ent = p.second;
+        ent->update();
+    }
 }
 
 std::vector<Entity*> EntityHandler::getEntities() {
