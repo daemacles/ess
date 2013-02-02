@@ -1,5 +1,9 @@
 #include "openglobject.h"
 
+#ifdef QT_VERSION
+    #include <QtOpenGL>
+#endif
+
 OpenGLObject::OpenGLObject(std::vector<polygon> polygons) {
 
     this->polygons = polygons;

@@ -1,3 +1,4 @@
+#include <string>
 #include "openglobject.h"
 
 class OBJParser {

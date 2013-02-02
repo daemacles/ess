@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    GUI* gui = new GUI(NULL, new Simulator);
+    GUI* gui = new GUI(NULL, NULL);
     gui->setup();
 
     return app.exec();

@@ -2,8 +2,8 @@
 #define _OPENGLOBJECT_H_
 
 #ifdef QT_VERSION
-#include <QtOpenGL>
 #endif
+    #include <QtOpenGL>
 
 #include <vector>
 

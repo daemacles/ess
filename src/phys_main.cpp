@@ -16,10 +16,12 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+/*
 #include <btBulletDynamicsCommon.h>
 #include "CcdPhysicsDemo.h"
 #include "GlutStuff.h"
 #include "GLDebugDrawer.h"
+#include <QtOpenGL>
 
 #include "simulator.h"
 
@@ -44,3 +46,4 @@ int main(int argc,char** argv)
     delete ccdDemo;
     return 0;
 }
+*/

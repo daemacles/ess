@@ -9,9 +9,10 @@ INCLUDEPATH += .
 
 QT += core gui svg opengl
 
+QMAKE_CXXFLAGS += -std=c++0x
+
 # Input
 HEADERS += accelsensor.h \
-           CcdPhysicsDemo.h \
            DebugCastResult.h \
            DemoApplication.h \
            distancesensor.h \
@@ -47,7 +48,7 @@ HEADERS += accelsensor.h \
            stlmesh.h \
            util.h \
            Win32DemoApplication.h
-SOURCES += CcdPhysicsDemo.cpp \
+SOURCES += \
            entity.cpp \
            entityhandler.cpp \
            glcanvas.cpp \
@@ -63,11 +64,6 @@ SOURCES += CcdPhysicsDemo.cpp \
            shapehandler.cpp \
            simulator.cpp \
            stlmesh.cpp
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/release/ -lOpenGLSupport
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/debug/ -lOpenGLSupport
-else:symbian: LIBS += -lOpenGLSupport
-else:unix: LIBS += -L$$PWD/ -lOpenGLSupport
 
 INCLUDEPATH += $$PWD/
 DEPENDPATH += $$PWD/
