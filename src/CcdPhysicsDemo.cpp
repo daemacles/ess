@@ -188,7 +188,7 @@ void CcdPhysicsDemo::initPhysics() {
                                                    btScalar(1.),
                                                    btScalar(110.)));
         btCollisionShape* groundShape = box;
-        m_collisionShapes.push_back(groundShape);
+        //m_collisionShapes.push_back(groundShape);
         btScalar mass(0.);
         btVector3 localInertia(0,0,0);
         btTransform groundTransform;
@@ -208,7 +208,7 @@ void CcdPhysicsDemo::initPhysics() {
 
     btVector3 localInertia(0,0,0);
     btCollisionShape* boxShape = new btBoxShape(btVector3(1,1,1));
-    m_collisionShapes.push_back(boxShape);
+    //m_collisionShapes.push_back(boxShape);
     boxShape->calculateLocalInertia(1.0f, localInertia);
 
     // ///  Create Dynamic Objects
@@ -324,17 +324,17 @@ void CcdPhysicsDemo::exitPhysics() {
     }
 
     // delete collision shapes
-    for (int j=0;j<m_collisionShapes.size();j++) {
-        btCollisionShape* shape = m_collisionShapes[j];
-        delete shape;
-    }
-    m_collisionShapes.clear();
+    // for (int j=0;j<m_collisionShapes.size();j++) {
+    //     btCollisionShape* shape = m_collisionShapes[j];
+    //     delete shape;
+    // }
+    // m_collisionShapes.clear();
 
-    delete m_dynamicsWorld;
-    delete m_solver;
-    delete m_broadphase;
-    delete m_dispatcher;
-    delete m_collisionConfiguration;
+    // delete m_dynamicsWorld;
+    // delete m_solver;
+    // delete m_broadphase;
+    // delete m_dispatcher;
+    // delete m_collisionConfiguration;
     delete m_rocketMesh;
 }
 

@@ -39,11 +39,11 @@ class CcdPhysicsDemo : public PlatformDemoApplication
 {
     private:
     // keep the collision shapes, for deletion/cleanup
-    btAlignedObjectArray<btCollisionShape*> m_collisionShapes;
-    btBroadphaseInterface	           *m_broadphase;
-    btCollisionDispatcher	           *m_dispatcher;
-    btConstraintSolver	                   *m_solver;
-    btDefaultCollisionConfiguration        *m_collisionConfiguration;
+    // btAlignedObjectArray<btCollisionShape*> m_collisionShapes;
+    // btBroadphaseInterface	           *m_broadphase;
+    // btCollisionDispatcher	           *m_dispatcher;
+    // btConstraintSolver	                   *m_solver;
+    // btDefaultCollisionConfiguration        *m_collisionConfiguration;
     btRigidBody                            *m_rocket;
     StlMesh                                *m_rocketMesh;
 

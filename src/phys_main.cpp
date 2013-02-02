@@ -29,6 +29,7 @@ int main(int argc,char** argv)
 {
     EntityHandler entities;
     Simulator sim(&entities);
+    
     btDynamicsWorld *world = sim.getDynamicsWorld();
     
     CcdPhysicsDemo* ccdDemo = new CcdPhysicsDemo();

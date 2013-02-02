@@ -12,11 +12,6 @@ EntityHandler::EntityHandler () {
 
 // TODO: convert to use a config file instead of hard coding what to load.
 void EntityHandler::init () {
-    // Load in the shapes to be used
-    ShapeHandler *sh = ShapeHandler::getHandler();
-    sh->addMesh("rocket", "../models/rocket01.stl");
-    sh->addBox("ground", btVector3(110.0, 1.0, 110.0));
-
     // Create the rigid bodies
     //Ground *g = new Ground();
     //staticEnts["ground"] = g;

@@ -42,6 +42,7 @@ Simulator::Simulator (EntityHandler *_ents):
             dynamicsWorld->addRigidBody(ent->getRigidBody());
         }
     }
+
     for (auto pr : entities->staticEnts) {
         auto ent = pr.second;
         if (ent->getRigidBody()) {
