@@ -9,15 +9,12 @@
 
 class BinaryReader;
 
-class StlLoader {
+class StlMesh : public btTriangleMesh {
     private:
-    std::unique_ptr<btTriangleMesh> m_mesh;
 
     public:
-    StlLoader (const std::string &filename);
-    virtual ~StlLoader();
-
-    btTriangleMesh* getMesh();
+    StlMesh (const std::string &filename, bool removeDuplicateVertices=false);
+    virtual ~StlMesh();
 };
 
 #endif

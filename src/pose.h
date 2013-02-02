@@ -1,3 +1,5 @@
+#ifndef _POSE_H
+#define _POSE_H 1
 
 #include "btBulletDynamicsCommon.h"
 
@@ -5,8 +7,15 @@ typedef btVector3 vec3;
 
 class Pose {
     public:
-        vec3 pos;
-        vec3 vel;
-        vec3 acc;
-        vec3 orientation;
+    btTransform worldTransform;
+    vec3 linVel;
+    vec3 angVel;
+    vec3 linForce;
+    vec3 torque;
+    int tick;                   ///< a time stamp of sorts
+
+    Pose () {}
+    Pose (btRigidBody *b);       // Copies pertinant information over
 };
+
+#endif

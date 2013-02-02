@@ -144,51 +144,53 @@ void CcdPhysicsDemo::displayCallback(void) {
     swapBuffers();
 }
 
+void CcdPhysicsDemo::setDynamicsWorld (btDynamicsWorld *world) {
+    m_dynamicsWorld = world;
+}
+
 void CcdPhysicsDemo::initPhysics() {
     setTexturing(true);
     setShadows(true);
  
     m_ShootBoxInitialSpeed = 80.f;
 
-    /// collision configuration contains default setup for memory, collision setup
-    m_collisionConfiguration = new btDefaultCollisionConfiguration();
+    // /// collision configuration contains default setup for memory, collision setup
+    // m_collisionConfiguration = new btDefaultCollisionConfiguration();
 
-    /// use the default collision dispatcher. For parallel processing you can
-    /// use a diffent dispatcher (see Extras/BulletMultiThreaded)
-    m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
-    m_dispatcher->registerCollisionCreateFunc(BOX_SHAPE_PROXYTYPE, BOX_SHAPE_PROXYTYPE,
-         m_collisionConfiguration->getCollisionAlgorithmCreateFunc(CONVEX_SHAPE_PROXYTYPE,
-                                                                   CONVEX_SHAPE_PROXYTYPE));
+    // /// use the default collision dispatcher. For parallel processing you can
+    // /// use a diffent dispatcher (see Extras/BulletMultiThreaded)
+    // m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
+    // m_dispatcher->registerCollisionCreateFunc(BOX_SHAPE_PROXYTYPE, BOX_SHAPE_PROXYTYPE,
+    //      m_collisionConfiguration->getCollisionAlgorithmCreateFunc(CONVEX_SHAPE_PROXYTYPE,
+    //                                                                CONVEX_SHAPE_PROXYTYPE));
 
-    m_broadphase = new btDbvtBroadphase();
+    // m_broadphase = new btDbvtBroadphase();
 
-    /// the default constraint solver. For parallel processing you can use a
-    /// different solver (see Extras/BulletMultiThreaded)
-    btSequentialImpulseConstraintSolver* sol = new btSequentialImpulseConstraintSolver;
-    m_solver = sol;
+    // /// the default constraint solver. For parallel processing you can use a
+    // /// different solver (see Extras/BulletMultiThreaded)
+    // btSequentialImpulseConstraintSolver* sol = new btSequentialImpulseConstraintSolver;
+    // m_solver = sol;
 
-    m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase,
-                                                  m_solver,m_collisionConfiguration);
-    m_dynamicsWorld->setDebugDrawer(&sDebugDrawer);
-    m_dynamicsWorld->getSolverInfo().m_splitImpulse=true;
-    m_dynamicsWorld->getSolverInfo().m_numIterations = 20;
-    m_dynamicsWorld->getDispatchInfo().m_useContinuous = m_ccdMode == USE_CCD;
-    m_dynamicsWorld->setGravity(btVector3(0,-10,0));
+    // m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase,
+    //                                               m_solver,m_collisionConfiguration);
+    // m_dynamicsWorld->setDebugDrawer(&sDebugDrawer);
+    // m_dynamicsWorld->getSolverInfo().m_splitImpulse=true;
+    // m_dynamicsWorld->getSolverInfo().m_numIterations = 20;
+    // m_dynamicsWorld->getDispatchInfo().m_useContinuous = m_ccdMode == USE_CCD;
+    // m_dynamicsWorld->setGravity(btVector3(0,-10,0));
 
-    /// create a few basic rigid bodies
-    btBoxShape* box = new btBoxShape(btVector3(btScalar(110.), btScalar(1.), btScalar(110.)));
-    btCollisionShape* groundShape = box;
-
-    m_collisionShapes.push_back(groundShape);
-
-
-    btVector3 localInertia(0,0,0);
-    
+    // Create the ground
     // We can also use DemoApplication::localCreateRigidBody, but for clarity
     // it is provided here:
     {
+        /// Create the shape for the ground
+        btBoxShape* box = new btBoxShape(btVector3(btScalar(110.),
+                                                   btScalar(1.),
+                                                   btScalar(110.)));
+        btCollisionShape* groundShape = box;
+        m_collisionShapes.push_back(groundShape);
         btScalar mass(0.);
-
+        btVector3 localInertia(0,0,0);
         btTransform groundTransform;
         groundTransform.setIdentity();
         
@@ -204,35 +206,36 @@ void CcdPhysicsDemo::initPhysics() {
         m_dynamicsWorld->addRigidBody(body);
     }
 
+    btVector3 localInertia(0,0,0);
     btCollisionShape* boxShape = new btBoxShape(btVector3(1,1,1));
     m_collisionShapes.push_back(boxShape);
     boxShape->calculateLocalInertia(1.0f, localInertia);
 
-    ///  Create Dynamic Objects
-    {
-        btScalar mass{5.f};
-        m_rocketMesh = new StlLoader("../models/object.stl");
+    // ///  Create Dynamic Objects
+    // {
+    //     btScalar mass{5.f};
+    //     m_rocketMesh = new StlMesh("../models/object.stl");
         
-        btVector3 localInertia(0,0,0);
-        btGImpactMeshShape *rocketShape = new btGImpactMeshShape(m_rocketMesh->getMesh());
-        rocketShape->updateBound();
-        rocketShape->calculateLocalInertia(mass, localInertia);
+    //     btVector3 localInertia(0,0,0);
+    //     btGImpactMeshShape *rocketShape = new btGImpactMeshShape(m_rocketMesh);
+    //     rocketShape->updateBound();
+    //     rocketShape->calculateLocalInertia(mass, localInertia);
         
-        btVector3 pos(0,10,-5);
-        btQuaternion rot(0,0,0,1);
-        btTransform trans;
-        trans.setIdentity();
-        trans.setOrigin(pos);
-        //trans.setRotation(rot);
-        btDefaultMotionState *myMotionState = new btDefaultMotionState(trans);
-        btRigidBody::btRigidBodyConstructionInfo cInfo(mass, myMotionState,
-                                                       rocketShape, localInertia);
-        btRigidBody *body = new btRigidBody(cInfo);
-        body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
-        m_dynamicsWorld->addRigidBody(body);
-        body->setRestitution(0.1);
-        m_rocket = body;
-    }
+    //     btVector3 pos(0,10,-5);
+    //     btQuaternion rot(0,0,0,1);
+    //     btTransform trans;
+    //     trans.setIdentity();
+    //     trans.setOrigin(pos);
+    //     //trans.setRotation(rot);
+    //     btDefaultMotionState *myMotionState = new btDefaultMotionState(trans);
+    //     btRigidBody::btRigidBodyConstructionInfo cInfo(mass, myMotionState,
+    //                                                    rocketShape, localInertia);
+    //     btRigidBody *body = new btRigidBody(cInfo);
+    //     body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
+    //     m_dynamicsWorld->addRigidBody(body);
+    //     body->setRestitution(0.1);
+    //     m_rocket = body;
+    // }
 }
 
 void CcdPhysicsDemo::clientResetScene() {

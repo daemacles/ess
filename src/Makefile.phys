@@ -10,7 +10,8 @@ OBJS =  phys_main.o \
 	entityhandler.o \
 	entity.o \
 	pose.o \
-	sensor.o
+	sensor.o \
+	shapehandler.o
 
 EXE = phys_demo
 

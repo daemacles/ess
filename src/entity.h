@@ -1,25 +1,33 @@
 #ifndef _ENTITY_H
 #define _ENTITY_H
 
-// This class represents an entity in the world
+#include <btBulletDynamicsCommon.h>
 
-#include <BulletDynamics/Dynamics/btRigidBody.h>
-
+#include "shapehandler.h"
 #include "openglobject.h"
 #include "pose.h"
 
+/// This class represents an entity in the world
 class Entity {
-    private:
+    protected:
     Pose pose;
-    btRigidBody *physObject;    // Handle to this entity in bullet
+    btRigidBody *rigidBody;    // Handle to this entity in bullet
     OpenGLObject *openglObject;
 
     public:
     Entity (btRigidBody *body=nullptr, 
             OpenGLObject *oglobj=nullptr);
-    OpenGLObject* getOpenGLObject();
+    virtual ~Entity ();
+
+    OpenGLObject* getOpenGLObject ();
+    btRigidBody* getRigidBody ();
     Pose& getPose();
-    void update (void);
+    
+    virtual void update (void);
+
+    protected:
+    virtual void initRigidBody (btScalar mass, btCollisionShape *shape,
+                                btTransform *trans = nullptr);
 };
 
 #endif

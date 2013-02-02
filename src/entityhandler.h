@@ -12,12 +12,15 @@ class EntityHandler {
     private:
 
     public:
-    std::map<std::string, Entity*> dynamicEnts;
-    std::map<std::string, Entity*> staticEnts;
+    typedef std::map<std::string, Entity*> entityMap_t;
+    entityMap_t dynamicEnts;
+    entityMap_t staticEnts;
     std::map<std::string, Sensor*> sensors;
 
     EntityHandler ();
     virtual ~EntityHandler ();
+
+    void init ();
     
     void addDynamic (std::string name, Entity* e) { dynamicEnts[name] = e; }
     void addStatic  (std::string name, Entity* e) { staticEnts[name] = e; }

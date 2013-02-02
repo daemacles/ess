@@ -1,6 +1,6 @@
 #include "LinearMath/btVector3.h"
 
-#include "StlLoader.h"
+#include "stlmesh.h"
 
 using namespace std;
 
@@ -12,6 +12,7 @@ class BinaryReader {
 
     public:
     BinaryReader(): buffer(nullptr), size(0), pos(0) {}
+
     BinaryReader(istream &is): buffer(nullptr), size(0), pos(0) {
         is.seekg (0, ios::end);
         size = is.tellg();
@@ -40,7 +41,7 @@ class BinaryReader {
     }
 };
 
-StlLoader::StlLoader(const string &filename): m_mesh(new btTriangleMesh) {
+StlMesh::StlMesh(const string &filename, bool removeDuplicateVertices): btTriangleMesh () {
     ifstream is;
     is.open(filename, ios::binary);
 
@@ -70,7 +71,7 @@ StlLoader::StlLoader(const string &filename): m_mesh(new btTriangleMesh) {
             btVector3 v2(x,z,y);
             uint16_t attribute_bytes = reader.next<uint16_t>();
             reader.setPos(reader.getPos() + attribute_bytes);
-            m_mesh->addTriangle(v0, v1, v2);
+            addTriangle(v0, v1, v2, false);
         }
     } catch (int e) {
         if (e == 20) {
@@ -81,9 +82,5 @@ StlLoader::StlLoader(const string &filename): m_mesh(new btTriangleMesh) {
     }
 }
 
-btTriangleMesh* StlLoader::getMesh() {
-    return m_mesh.get();
-}
-
-StlLoader::~StlLoader() {
+StlMesh::~StlMesh() {
 }

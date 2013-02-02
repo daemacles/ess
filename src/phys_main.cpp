@@ -27,14 +27,14 @@ GLDebugDrawer	gDebugDrawer;
 
 int main(int argc,char** argv)
 {
-    CcdPhysicsDemo* ccdDemo = new CcdPhysicsDemo();
-    ccdDemo->initPhysics();
-    ccdDemo->getDynamicsWorld()->setDebugDrawer(&gDebugDrawer);
-
     EntityHandler entities;
     Simulator sim(&entities);
+    btDynamicsWorld *world = sim.getDynamicsWorld();
     
-    btDynamicsWorld *world = ccdDemo->getDynamicsWorld();
+    CcdPhysicsDemo* ccdDemo = new CcdPhysicsDemo();
+    ccdDemo->setDynamicsWorld(world);
+    ccdDemo->initPhysics();
+    world->setDebugDrawer(&gDebugDrawer);
     world->setInternalTickCallback(simCallback, static_cast<void*>(&sim));
     
     glutmain(argc, argv, 640, 480,

@@ -23,7 +23,7 @@
 #define PlatformDemoApplication GlutDemoApplication
 
 #include "LinearMath/btAlignedObjectArray.h"
-#include "StlLoader.h"
+#include "stlmesh.h"
 
 class btBroadphaseInterface;
 class btCollisionShape;
@@ -45,7 +45,7 @@ class CcdPhysicsDemo : public PlatformDemoApplication
     btConstraintSolver	                   *m_solver;
     btDefaultCollisionConfiguration        *m_collisionConfiguration;
     btRigidBody                            *m_rocket;
-    StlLoader                              *m_rocketMesh;
+    StlMesh                                *m_rocketMesh;
 
     enum { USE_CCD=1,
            USE_NO_CCD
@@ -59,6 +59,7 @@ class CcdPhysicsDemo : public PlatformDemoApplication
     virtual ~CcdPhysicsDemo() { exitPhysics(); }
 
     void         initPhysics();
+    void         setDynamicsWorld (btDynamicsWorld *world);
     void	 exitPhysics();
     virtual void clientMoveAndDisplay();
             void displayText();
