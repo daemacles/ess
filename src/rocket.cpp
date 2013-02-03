@@ -1,5 +1,3 @@
-#include <cstdio>
-
 #include "rocket.h"
 
 Rocket::Rocket (btVector3 startPos, btScalar mass) {
@@ -10,6 +8,7 @@ Rocket::Rocket (btVector3 startPos, btScalar mass) {
     }
     
     btCollisionShape *rocketShape = sh->getShape("rocket01");
+    this->openglObject = sh->getMesh("rocket01")->openglobj;
 
     // Set up our beginning transform
     //btQuaternion rot(0,0,0,1);
@@ -19,7 +18,7 @@ Rocket::Rocket (btVector3 startPos, btScalar mass) {
   
     initRigidBody(5.0, rocketShape, &trans);
 }
-
+    
 void Rocket::update (btScalar timeStep, btScalar time) {
     // First, save our current (old) pose
     poseHistory.push_back(pose);

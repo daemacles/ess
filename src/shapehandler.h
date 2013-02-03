@@ -5,6 +5,7 @@
 #include <string>
 #include <btBulletDynamicsCommon.h> // main Bullet include file, contains most
                                     // common include files.
+#include "stlmesh.h"
 
 /*! \class ShapeHandler
  * Maintains a store of btCollisionShapes that can be assigned to rigid
@@ -21,7 +22,7 @@ class ShapeHandler {
 
     /// Keeps track of memory used by the meshes backing any shapes like
     /// btGImpactShape, btBvhTriangleShape, or btHeightfieldTerrainShape
-    std::map<btCollisionShape*, btTriangleMesh*> meshes;
+    std::map<btCollisionShape*, StlMesh*> meshes;
     
     public:
     virtual ~ShapeHandler ();
@@ -31,6 +32,8 @@ class ShapeHandler {
 
     /// Returns a pointer to a named shape
     btCollisionShape *getShape(std::string name);
+
+    StlMesh *getMesh(std::string name);
 
     ///
     /// \param name handle for this shape

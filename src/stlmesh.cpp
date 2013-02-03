@@ -46,6 +46,8 @@ StlMesh::StlMesh(const string &filename, bool removeDuplicateVertices):
     ifstream is;
     is.open(filename, ios::binary);
 
+    std::vector<btVector3*> polygons;
+
     BinaryReader reader(is);
     reader.setPos(80);        // skip the header
 
@@ -62,13 +64,16 @@ StlMesh::StlMesh(const string &filename, bool removeDuplicateVertices):
             y = reader.next<float>();
             z = reader.next<float>();
             btVector3 v0(x,z,y);
+            polygons.push_back(new btVector3(x,z,y));
             x = reader.next<float>();
             y = reader.next<float>();
             z = reader.next<float>();
+            polygons.push_back(new btVector3(x,z,y));
             btVector3 v1(x,z,y);
             x = reader.next<float>();
             y = reader.next<float>();
             z = reader.next<float>();
+            polygons.push_back(new btVector3(x,z,y));
             btVector3 v2(x,z,y);
             uint16_t attribute_bytes = reader.next<uint16_t>();
             reader.setPos(reader.getPos() + attribute_bytes);
@@ -81,6 +86,8 @@ StlMesh::StlMesh(const string &filename, bool removeDuplicateVertices):
             cout << "Unknown exception" << endl;
         }
     }
+
+    this->openglobj = new OpenGLObject(polygons);
 }
 
 StlMesh::~StlMesh() {

@@ -22,13 +22,13 @@
 #include "CcdPhysicsDemo.h"
 #include "GlutStuff.h"
 #include "GLDebugDrawer.h"
+#include <QtOpenGL>
 
 #include "simulator.h"
-#include "rocket.h"
 
 GLDebugDrawer gDebugDrawer;
 
-int main(int argc,char** argv)
+int phys_main(int argc,char** argv)
 {
     EntityHandler entities;
     Simulator sim(&entities);

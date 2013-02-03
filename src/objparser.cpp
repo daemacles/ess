@@ -15,7 +15,7 @@ OpenGLObject* OBJParser::parse(std::string filename) {
 
 
     if(file.is_open()) {
-        std::vector<polygon> polygons;
+        std::vector<btVector3*> polygons;
 
         while(file.good()) {
             getline(file, line);
@@ -41,15 +41,11 @@ OpenGLObject* OBJParser::parse(std::string filename) {
                     }
                 }
 
-                polygon pol;
+                btVector3* vec = new btVector3((float) atof(str.substr(a, b - 1).c_str()),
+                        (float) atof(str.substr(b, c - b - 1).c_str()),
+                        (float) atof(str.substr(c, str.length() - b - c).c_str()));
 
-                pol.x = (float) atof(str.substr(a, b - 1).c_str());
-                pol.y = (float) atof(str.substr(b, c - b - 1).c_str());
-                pol.z = (float) atof(str.substr(c, str.length() - b - c).c_str());
-
-                printf("%f %f %f\n", pol.x, pol.y, pol.z);
-
-                polygons.push_back(pol);
+                polygons.push_back(vec);
 
             } else if(line[0] == 'f') {
 
