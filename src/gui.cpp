@@ -17,7 +17,7 @@ float ff = 0.0;
 
 void draw_entity_openglob(Entity* e) {
     Pose pose = e->getPose();
-    e->getOpenGLObject()->draw(sin(ff), 0, 0);
+    //e->getOpenGLObject()->draw(sin(ff), 0, 0);
     ff += 0.05;
     //e->getOpenGLObject()->draw(pose->pos.x, pose->pos.y, pose->pos.z);
 }
@@ -105,7 +105,8 @@ void GUI::draw() {
 
     for(auto o : this->entityHandler->dynamicEnts) {
         Entity* e = o.second;
-        e->getOpenGLObject()->draw(0,0,0);
+        e->getOpenGLObject()->draw(&e->getPose());
+        ff += 1;
     }
     //draw_entity_openglob(this->entityHandler->getEntities()[0]);
     //this->entityHandler->getEntities()[0]->getOpenGLObject()->draw(0,0,0);

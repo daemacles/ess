@@ -5,6 +5,8 @@
 #include <vector>
 #include "LinearMath/btVector3.h"
 
+#include "pose.h"
+
 struct polygon {
     float x, y, z;
 };
@@ -14,7 +16,7 @@ class OpenGLObject {
     
     public:
     std::vector<btVector3*> polygons;
-    void draw(float x, float y, float z);
+    void draw(Pose* pose);
     OpenGLObject(std::vector<btVector3*> polygons);
 };
 

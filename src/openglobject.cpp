@@ -43,8 +43,7 @@ OpenGLObject::OpenGLObject(std::vector<btVector3*> polygons) {
     */
 }
 
-void OpenGLObject::draw(float x, float y, float z) {
-
+void OpenGLObject::draw(Pose* pose) {
     int ii = 0;
 
     //for(int i = 0; i < sizee; i++) {
@@ -54,7 +53,10 @@ void OpenGLObject::draw(float x, float y, float z) {
     //}
 
     glPushMatrix();
-    glTranslatef(x, y, z);
+    //glRotatef(pose->worldTransform.x(), pose->worldTransform.y(), pose->worldTransform.z(), 45);
+    //pose->worldTransform.getOpenGLMatrix(mat);
+    glTranslatef(pose->worldTransform.getOrigin().x(), pose->worldTransform.getOrigin().y(), pose->worldTransform.getOrigin().z());
+    glRotatef(pose->worldTransform.getOrigin().x(), pose->worldTransform.getOrigin().y(), pose->worldTransform.getOrigin().z(), 90);
     glBegin(GL_TRIANGLES);
 
     for(auto vec : this->polygons) {
