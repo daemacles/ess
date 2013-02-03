@@ -2,6 +2,8 @@
 
 #include "gui.h"
 
+int phys_main(int, char**);
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -12,5 +14,11 @@ int main(int argc, char *argv[])
     GUI* gui = new GUI(entityHandler, simulator);
     gui->setup();
 
-    return app.exec();
+    app.exec();
+
+    delete entityHandler;
+    delete simulator;
+
+    phys_main(argc, argv);
+    return 0;
 }

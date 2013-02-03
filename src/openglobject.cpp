@@ -1,9 +1,8 @@
 #include "openglobject.h"
 #include <stdio.h>
 
-#ifdef QT_VERSION
-    #include <QtOpenGL>
-#endif
+#ifndef PHYS_DEMO
+#include <QtOpenGL>
 
 OpenGLObject::OpenGLObject(std::vector<btVector3*> polygons) {
     printf("OpenGLObject created with %d polygons\n", polygons.size());
@@ -82,3 +81,4 @@ void OpenGLObject::draw(Pose* pose) {
     glFlush();
     */
 }
+#endif

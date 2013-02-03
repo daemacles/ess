@@ -9,7 +9,7 @@ INCLUDEPATH += .
 
 QT += core gui svg opengl
 
-QMAKE_CXXFLAGS += -std=c++0x
+QMAKE_CXXFLAGS += -std=c++11 -g
 
 # Input
 HEADERS += accelsensor.h \
@@ -63,7 +63,8 @@ SOURCES += \
            sensor.cpp \
            shapehandler.cpp \
            simulator.cpp \
-           stlmesh.cpp
+           stlmesh.cpp \
+           CcdPhysicsDemo.cpp
 
 INCLUDEPATH += $$PWD/
 DEPENDPATH += $$PWD/
@@ -74,3 +75,5 @@ else:unix:!symbian: PRE_TARGETDEPS += $$PWD/libOpenGLSupport.a
 
 unix: CONFIG += link_pkgconfig
 unix: PKGCONFIG += bullet
+
+unix|win32: LIBS += -L. -lOpenGLSupport -lGLU -lglut -lm

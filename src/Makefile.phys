@@ -1,6 +1,6 @@
 CC = g++-4.7
 CFLAGS = $(OPTIMIZE) -std=c++11 -Wall -g -I. -I../src \
-         $(shell pkg-config bullet --cflags)
+         $(shell pkg-config bullet --cflags) -DPHYS_DEMO
 CLIBS = -L. -lOpenGLSupport $(shell pkg-config bullet --libs) \
         -lm -lGL -lGLU -lglut 
 SRCS =  phys_main.cpp \
