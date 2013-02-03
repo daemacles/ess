@@ -8,12 +8,15 @@
 #include "pose.h"
 
 class Rocket : public Entity {
-    private:
+    protected:
     std::vector<Pose> poseHistory;
 
     public:
     Rocket (btVector3 startPos = btVector3(0,10,0),
             btScalar mass = 5.0);
+
+    void update (btScalar timeStep, btScalar time);
+    std::vector<Pose>& getPoseHistory ();
 };
 
 #endif

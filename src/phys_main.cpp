@@ -16,14 +16,17 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+#include <cstdio>
+#include <cmath>
 #include <btBulletDynamicsCommon.h>
 #include "CcdPhysicsDemo.h"
 #include "GlutStuff.h"
 #include "GLDebugDrawer.h"
 
 #include "simulator.h"
+#include "rocket.h"
 
-GLDebugDrawer	gDebugDrawer;
+GLDebugDrawer gDebugDrawer;
 
 int main(int argc,char** argv)
 {
@@ -41,6 +44,27 @@ int main(int argc,char** argv)
     glutmain(argc, argv, 640, 480,
              "Bullet Physics Demo. http://bulletphysics.com", ccdDemo);
 
+    if (argc == 2) {
+        printf ("timestamp x y z phi theta psi\n");
+        Rocket *rocket = static_cast<Rocket*>(entities.dynamicEnts.at("rocket"));
+        auto &poseHistory = rocket->getPoseHistory();
+        for (auto &pose : poseHistory) {
+            btVector3 position = pose.worldTransform.getOrigin();
+            btQuaternion q = pose.worldTransform.getRotation();
+            double q0 = q.x();
+            double q1 = q.y();
+            double q2 = q.z();
+            double q3 = q.w();
+            double phi = atan2(2*(q0*q1 + q2*q3), 1 - 2*(q1*q1 + q2*q2));
+            double theta = asin(2*(q0*q2 - q3*q1));
+            double psi = atan2(2*(q0*q3 + q1*q2), 1 - 2*(q2*q2 + q3*q3));
+            printf("%9.4f %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",
+                   pose.timestamp,
+                   position.getX(), position.getY(), position.getZ(),
+                   phi, theta, psi);
+        }
+    }
+    printf("Program finished, bye!\n");
     delete ccdDemo;
     return 0;
 }

@@ -13,17 +13,14 @@ EntityHandler::EntityHandler () {
 // TODO: convert to use a config file instead of hard coding what to load.
 void EntityHandler::init () {
     // Create the rigid bodies
-    //Ground *g = new Ground();
-    //staticEnts["ground"] = g;
-
-    Rocket *r = new Rocket();
-    dynamicEnts["rocket"] = r;
+    staticEnts["ground"] = new Ground();
+    dynamicEnts["rocket"] = new Rocket();
 }    
 
-void EntityHandler::callUpdates (void) {
+void EntityHandler::callUpdates (btScalar timeStep, btScalar time) {
     for (auto pr : dynamicEnts) {
         auto ent = pr.second;
-        ent->update();
+        ent->update(timeStep, time);
     }
 }
 

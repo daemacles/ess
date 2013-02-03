@@ -16,6 +16,7 @@ class Simulator {
     btCollisionDispatcher          *dispatcher;
     btBroadphaseInterface          *broadphase;
     btConstraintSolver             *solver;
+    btScalar                       elapsedTime; ///< time since beginning of world
     
     public:
     Simulator (EntityHandler *_ents);

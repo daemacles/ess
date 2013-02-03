@@ -41,7 +41,8 @@ class BinaryReader {
     }
 };
 
-StlMesh::StlMesh(const string &filename, bool removeDuplicateVertices): btTriangleMesh () {
+StlMesh::StlMesh(const string &filename, bool removeDuplicateVertices):
+    btTriangleMesh () {
     ifstream is;
     is.open(filename, ios::binary);
 

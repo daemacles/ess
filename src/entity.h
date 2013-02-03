@@ -23,7 +23,7 @@ class Entity {
     btRigidBody* getRigidBody ();
     Pose& getPose();
     
-    virtual void update (void);
+    virtual void update (btScalar timeStep, btScalar time);
 
     protected:
     virtual void initRigidBody (btScalar mass, btCollisionShape *shape,

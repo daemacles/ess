@@ -1,4 +1,4 @@
-#include <cstdio>
+#include <iostream>
 #include <vector>
 
 #include "simulator.h"
@@ -9,7 +9,7 @@ void simCallback(btDynamicsWorld *world, btScalar timeStep) {
 }
 
 Simulator::Simulator (EntityHandler *_ents):
-    entities(_ents) {
+    entities(_ents), elapsedTime(0.0) {
     
     /// collision configuration contains default setup for memory, collision setup
     collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -32,27 +32,31 @@ Simulator::Simulator (EntityHandler *_ents):
                                                 solver, collisionConfiguration);
     dynamicsWorld->getSolverInfo().m_splitImpulse = true;
     dynamicsWorld->getSolverInfo().m_numIterations = 20;
-    dynamicsWorld->getDispatchInfo().m_useContinuous = 0; //USE_CCD;
+    dynamicsWorld->getDispatchInfo().m_useContinuous = 1;
     dynamicsWorld->setGravity(btVector3(0, -9.8, 0));
 
-    /// Add all entities to our dynamics world
-    for (auto pr : entities->dynamicEnts) {
-        auto ent = pr.second;
-        if (ent->getRigidBody()) {
-            dynamicsWorld->addRigidBody(ent->getRigidBody());
-        }
-    }
-
+    // Add all entities to our dynamics world, starting with the static
+    // things.
     for (auto pr : entities->staticEnts) {
         auto ent = pr.second;
         if (ent->getRigidBody()) {
+            std::cout << "Adding static entity " << pr.first << std::endl;
+            dynamicsWorld->addRigidBody(ent->getRigidBody());
+        }
+    }
+    
+    for (auto pr : entities->dynamicEnts) {
+        auto ent = pr.second;
+        if (ent->getRigidBody()) {
+            std::cout << "Adding dynamic entity " << pr.first << std::endl;
             dynamicsWorld->addRigidBody(ent->getRigidBody());
         }
     }
 }
 
 void Simulator::callback (btScalar timeStep) {
-    entities->callUpdates();
+    elapsedTime += timeStep;
+    entities->callUpdates(timeStep, elapsedTime);
 }
 
 btDynamicsWorld* Simulator::getDynamicsWorld () {

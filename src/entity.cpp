@@ -1,4 +1,5 @@
 #include <memory>
+#include <cstdio>
 
 #include "entity.h"
 
@@ -9,9 +10,10 @@ Entity::Entity (btRigidBody *body, OpenGLObject *oglobj):
     // TODO?
 }
 
-void Entity::update (void) {
+void Entity::update (btScalar timeStep, btScalar time) {
     if (rigidBody) {
-        // printf("I got updated!");
+        pose.update(rigidBody, time);
+        //printf("I got updated! %f\n", timeStep);
     }
 }
 
@@ -30,10 +32,10 @@ Pose& Entity::getPose() {
 void Entity::initRigidBody (btScalar mass, btCollisionShape *shape, btTransform *trans) {
     // Create a default transform if one is not provided to us
     if (trans == nullptr) {
-        std::unique_ptr<btTransform> utrans(new btTransform());
-        trans = utrans.get();
-        trans->setIdentity();
-        //trans->setOrigin(btVector3(0,0,0));
+        btTransform t;
+        t.setIdentity();
+        t.setOrigin(btVector3(0,0,0));
+        trans = &t;
     }
     
     btDefaultMotionState *myMotionState = new btDefaultMotionState(*trans);
@@ -49,6 +51,7 @@ void Entity::initRigidBody (btScalar mass, btCollisionShape *shape, btTransform 
 }
 
 Entity::~Entity() {
+    printf("Deleted an entity\n");
     delete rigidBody;
     rigidBody = nullptr;
     delete openglObject;

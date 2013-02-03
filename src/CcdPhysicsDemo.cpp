@@ -64,21 +64,7 @@ void myCallback(btDynamicsWorld *world, btScalar timeStep) {
     d->callback(timeStep);
 }
 void CcdPhysicsDemo::callback(btScalar timeStep) {
-    // Bouncing rocket
-    float height = 5.0f;
-    float maxThrust = 20.0f;
-    m_rocket->setActivationState(ACTIVE_TAG);
-    auto ori = m_rocket->getOrientation();
-    auto trans = m_rocket->getWorldTransform().getOrigin();
-    float error = height - trans[1];
-    if (error < 0) error = 0.0f;
-    float impulseStrength = 5.0f * error;
-    if (impulseStrength > maxThrust) impulseStrength = maxThrust;
-    btVector3 thrust(0,1,0);
-    btVector3 impulse = thrust.rotate(ori.getAxis(), ori.getAngle());
-    impulse *= impulseStrength;
-    btVector3 relPos(0,0,0);
-    m_rocket->applyImpulse(impulse,relPos);
+
 }
 
 
@@ -114,17 +100,6 @@ void CcdPhysicsDemo::displayText() {
         sprintf(buf,"Press 'p' to change CCD mode");
         GLDebugDrawString(xStart,yStart,buf);
 
-        if (m_rocket) {
-            yStart += 20;
-            glRasterPos3f(xStart, yStart, 0);
-            auto ori = m_rocket->getOrientation();
-            auto axis = ori.getAxis();
-            auto angle = ori.getAngle();
-            sprintf(buf, "Orientation: (%2.2f, %2.2f, %2.2f) %2.2f", axis.x(), axis.y(), axis.z(),
-                    angle);
-            GLDebugDrawString(xStart, yStart, buf);
-        }
-  
         resetPerspectiveProjection();
         glEnable(GL_LIGHTING);
     } 
@@ -179,32 +154,32 @@ void CcdPhysicsDemo::initPhysics() {
     // m_dynamicsWorld->getDispatchInfo().m_useContinuous = m_ccdMode == USE_CCD;
     // m_dynamicsWorld->setGravity(btVector3(0,-10,0));
 
-    // Create the ground
-    // We can also use DemoApplication::localCreateRigidBody, but for clarity
-    // it is provided here:
-    {
-        /// Create the shape for the ground
-        btBoxShape* box = new btBoxShape(btVector3(btScalar(110.),
-                                                   btScalar(1.),
-                                                   btScalar(110.)));
-        btCollisionShape* groundShape = box;
-        //m_collisionShapes.push_back(groundShape);
-        btScalar mass(0.);
-        btVector3 localInertia(0,0,0);
-        btTransform groundTransform;
-        groundTransform.setIdentity();
+    // // Create the ground
+    // // We can also use DemoApplication::localCreateRigidBody, but for clarity
+    // // it is provided here:
+    // {
+    //     /// Create the shape for the ground
+    //     btBoxShape* box = new btBoxShape(btVector3(btScalar(110.),
+    //                                                btScalar(1.),
+    //                                                btScalar(110.)));
+    //     btCollisionShape* groundShape = box;
+    //     //m_collisionShapes.push_back(groundShape);
+    //     btScalar mass(0.);
+    //     btVector3 localInertia(0,0,0);
+    //     btTransform groundTransform;
+    //     groundTransform.setIdentity();
         
-        // using motionstate is recommended, it provides interpolation
-        // capabilities, and only synchronizes 'active' objects
-        btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
-        btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState,
-                                                        groundShape,localInertia);
-        btRigidBody* body = new btRigidBody(rbInfo);
-        body->setRestitution(.8);
+    //     // using motionstate is recommended, it provides interpolation
+    //     // capabilities, and only synchronizes 'active' objects
+    //     btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
+    //     btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState,
+    //                                                     groundShape,localInertia);
+    //     btRigidBody* body = new btRigidBody(rbInfo);
+    //     body->setRestitution(.8);
 
-        // add the body to the dynamics world
-        m_dynamicsWorld->addRigidBody(body);
-    }
+    //     // add the body to the dynamics world
+    //     m_dynamicsWorld->addRigidBody(body);
+    // }
 
     btVector3 localInertia(0,0,0);
     btCollisionShape* boxShape = new btBoxShape(btVector3(1,1,1));
@@ -256,18 +231,6 @@ void CcdPhysicsDemo::keyboardCallback(unsigned char key, int x, int y) {
         }
         };
         clientResetScene();
-    } else if (key == 'w') {
-        m_rocket->setActivationState(ACTIVE_TAG);
-        //btVector3 impulse = m_rocket->getWorldTransform().getOrigin();
-        auto ori = m_rocket->getOrientation();
-        
-        btVector3 thrust(0,1,0);
-        btVector3 impulse = thrust.rotate(ori.getAxis(), ori.getAngle());
-        float impulseStrength = 40.f;
-        impulse *= impulseStrength;
-        btVector3 relPos(0,0,0);//m_rocket->getCenterOfMassPosition();
-        //relPos[1] -= 10;
-        m_rocket->applyImpulse(impulse,relPos);
     } else {
         DemoApplication::keyboardCallback(key,x,y);
     }
@@ -313,15 +276,15 @@ void CcdPhysicsDemo::exitPhysics() {
     // cleanup in the reverse order of creation/initialization
 
     // remove the rigidbodies from the dynamics world and delete them
-    for (int i = m_dynamicsWorld->getNumCollisionObjects()-1; i != 0 ; --i) {
-        btCollisionObject* obj = m_dynamicsWorld->getCollisionObjectArray()[i];
-        btRigidBody* body = btRigidBody::upcast(obj);
-        if (body && body->getMotionState()) {
-            delete body->getMotionState();
-        }
-        m_dynamicsWorld->removeCollisionObject( obj );
-        delete obj;
-    }
+    // for (int i = m_dynamicsWorld->getNumCollisionObjects()-1; i != 0 ; --i) {
+    //     btCollisionObject* obj = m_dynamicsWorld->getCollisionObjectArray()[i];
+    //     btRigidBody* body = btRigidBody::upcast(obj);
+    //     if (body && body->getMotionState()) {
+    //         delete body->getMotionState();
+    //     }
+    //     m_dynamicsWorld->removeCollisionObject( obj );
+    //     delete obj;
+    // }
 
     // delete collision shapes
     // for (int j=0;j<m_collisionShapes.size();j++) {
