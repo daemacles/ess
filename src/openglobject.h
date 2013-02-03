@@ -15,6 +15,7 @@ struct polygon {
 
 class OpenGLObject {
     private:
+        float ff;
     
     public:
     std::vector<btVector3*> polygons;
