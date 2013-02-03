@@ -51,5 +51,6 @@ $(EXE): $(OBJS)
 
 clean:
 	rm -f *.o
+	rm -f *.P
 	rm -f $(EXE)
 # DO NOT DELETE
