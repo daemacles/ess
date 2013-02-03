@@ -1,3 +1,5 @@
 src
 moc_*
 Makefile
+GSYMS
+GTAGS
