@@ -103,6 +103,7 @@ void GUI::draw() {
     //OpenGLObject* globj = new OpenGLObject(NULL);
     //
 
+    printf("BBBB\n");
     for(auto o : this->entityHandler->dynamicEnts) {
         Entity* e = o.second;
         e->getOpenGLObject()->draw(&e->getPose());
