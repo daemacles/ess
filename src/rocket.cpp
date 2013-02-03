@@ -8,6 +8,7 @@ Rocket::Rocket (btVector3 startPos, btScalar mass) {
     }
     
     btCollisionShape *groundShape = sh->getShape("rocket01");
+    this->openglObject = sh->getMesh("rocket01")->openglobj;
 
     // Set up our beginning transform
     //btQuaternion rot(0,0,0,1);

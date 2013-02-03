@@ -1,11 +1,9 @@
 #ifndef _OPENGLOBJECT_H_
 #define _OPENGLOBJECT_H_
 
-#ifdef QT_VERSION
-#endif
-    #include <QtOpenGL>
-
+#include <QtOpenGL>
 #include <vector>
+#include "LinearMath/btVector3.h"
 
 struct polygon {
     float x, y, z;
@@ -13,11 +11,11 @@ struct polygon {
 
 class OpenGLObject {
     private:
-    std::vector<polygon> polygons;
     
     public:
+    std::vector<btVector3*> polygons;
     void draw(float x, float y, float z);
-    OpenGLObject(std::vector<polygon> polygons);
+    OpenGLObject(std::vector<btVector3*> polygons);
 };
 
 #endif

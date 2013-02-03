@@ -1,12 +1,18 @@
 #include "openglobject.h"
+#include <stdio.h>
 
 #ifdef QT_VERSION
     #include <QtOpenGL>
 #endif
 
-OpenGLObject::OpenGLObject(std::vector<polygon> polygons) {
-
-    this->polygons = polygons;
+OpenGLObject::OpenGLObject(std::vector<btVector3*> polygons) {
+    printf("OpenGLObject created with %d polygons\n", polygons.size());
+    this->polygons = std::vector<btVector3*>(polygons.size());
+    for(int i = 0; i < this->polygons.size(); i++) {
+        this->polygons[i] = polygons[i];
+        //printf("%d, %p\n", &polygons[i]);
+        //glVertex3f(this->polygons[i].x(), this->polygons[i].y(), this->polygons[i].z());
+    }
     /*
     this->polygons.resize(3);
 
@@ -39,17 +45,26 @@ OpenGLObject::OpenGLObject(std::vector<polygon> polygons) {
 
 void OpenGLObject::draw(float x, float y, float z) {
 
+    int ii = 0;
+
+    //for(int i = 0; i < sizee; i++) {
+        //printf("%p\n", &this->polygons);
+        //printf("%p\n", &this->polygons[0]);
+        //glVertex3f(this->polygons[i].x(), this->polygons[i].y(), this->polygons[i].z());
+    //}
+
     glPushMatrix();
     glTranslatef(x, y, z);
     glBegin(GL_TRIANGLES);
 
-    for(int i = 0; i != this->polygons.size(); i++) {
-        glVertex3f(this->polygons[i].x, this->polygons[i].y, this->polygons[i].z);
+    for(auto vec : this->polygons) {
+        glVertex3f(vec->x(), vec->y(), vec->z());
     }
 
     glEnd();
 
     glPopMatrix();
+    return;
 
     /*
     glClearColor(1.0, 1.0, 0.0, 1.0);

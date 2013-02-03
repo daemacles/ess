@@ -18,6 +18,10 @@ btCollisionShape* ShapeHandler::getShape (std::string name) {
     return shapes.at(name);
 }
 
+StlMesh* ShapeHandler::getMesh (std::string name) {
+    return meshes.at(shapes.at(name));
+}
+
 //  !!!!! BUG?
 // 
 // What to do if someone adds a mesh with the same name?  I think this should

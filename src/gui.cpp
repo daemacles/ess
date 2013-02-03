@@ -103,6 +103,10 @@ void GUI::draw() {
     //OpenGLObject* globj = new OpenGLObject(NULL);
     //
 
+    for(auto o : this->entityHandler->dynamicEnts) {
+        Entity* e = o.second;
+        e->getOpenGLObject()->draw(0,0,0);
+    }
     //draw_entity_openglob(this->entityHandler->getEntities()[0]);
     //this->entityHandler->getEntities()[0]->getOpenGLObject()->draw(0,0,0);
 
