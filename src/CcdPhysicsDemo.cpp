@@ -32,9 +32,7 @@
 
 static GLDebugDrawer sDebugDrawer;
 
-CcdPhysicsDemo::CcdPhysicsDemo() :
-    m_rocketMesh(nullptr),
-    m_ccdMode(USE_CCD)
+CcdPhysicsDemo::CcdPhysicsDemo()
 {
     setDebugMode(btIDebugDraw::DBG_DrawText + btIDebugDraw::DBG_NoHelpText);
     setCameraDistance(btScalar(20.));
@@ -42,19 +40,15 @@ CcdPhysicsDemo::CcdPhysicsDemo() :
 
 void CcdPhysicsDemo::clientMoveAndDisplay() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
-
-    // simple dynamics world doesn't handle fixed-time-stepping
-    //float ms = getDeltaTimeMicroseconds();
  
     /// step the simulation
     if (m_dynamicsWorld) {
-        m_dynamicsWorld->stepSimulation(1./60.);// ms / 1000000.f);
+        m_dynamicsWorld->stepSimulation(1./60.);
         // optional but useful: debug drawing
         m_dynamicsWorld->debugDrawWorld();
     }
   
     renderme(); 
-    displayText();
     glFlush();
     swapBuffers();
 }
@@ -63,46 +57,12 @@ void myCallback(btDynamicsWorld *world, btScalar timeStep) {
     CcdPhysicsDemo *d = static_cast<CcdPhysicsDemo *>(world->getWorldUserInfo());
     d->callback(timeStep);
 }
-void CcdPhysicsDemo::callback(btScalar timeStep) {
 
+void CcdPhysicsDemo::callback(btScalar timeStep) {
 }
 
 
 void CcdPhysicsDemo::displayText() {
-    int lineWidth = 440;
-    int xStart = m_glutScreenWidth - lineWidth;
-    int yStart = 20;
-
-    if((getDebugMode() & btIDebugDraw::DBG_DrawText)!=0) {
-        setOrthographicProjection();
-        glDisable(GL_LIGHTING);
-        glColor3f(0, 0, 0);
-        char buf[124];
-  
-        glRasterPos3f(xStart, yStart, 0);
-        switch (m_ccdMode) {
-        case USE_CCD: {
-            sprintf(buf,"Predictive contacts and motion clamping");
-            break;
-        }
-        case USE_NO_CCD: {
-            sprintf(buf,"CCD handling disabled");
-            break;
-        }
-        default: {
-            sprintf(buf,"unknown CCD setting");
-        };
-        };
-        GLDebugDrawString(xStart, yStart, buf);
-
-        yStart += 20;
-        glRasterPos3f(xStart, yStart, 0);
-        sprintf(buf,"Press 'p' to change CCD mode");
-        GLDebugDrawString(xStart,yStart,buf);
-
-        resetPerspectiveProjection();
-        glEnable(GL_LIGHTING);
-    } 
 }
 
 void CcdPhysicsDemo::displayCallback(void) {
@@ -129,111 +89,16 @@ void CcdPhysicsDemo::initPhysics() {
  
     m_ShootBoxInitialSpeed = 80.f;
 
-    // /// collision configuration contains default setup for memory, collision setup
-    // m_collisionConfiguration = new btDefaultCollisionConfiguration();
-
-    // /// use the default collision dispatcher. For parallel processing you can
-    // /// use a diffent dispatcher (see Extras/BulletMultiThreaded)
-    // m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
-    // m_dispatcher->registerCollisionCreateFunc(BOX_SHAPE_PROXYTYPE, BOX_SHAPE_PROXYTYPE,
-    //      m_collisionConfiguration->getCollisionAlgorithmCreateFunc(CONVEX_SHAPE_PROXYTYPE,
-    //                                                                CONVEX_SHAPE_PROXYTYPE));
-
-    // m_broadphase = new btDbvtBroadphase();
-
-    // /// the default constraint solver. For parallel processing you can use a
-    // /// different solver (see Extras/BulletMultiThreaded)
-    // btSequentialImpulseConstraintSolver* sol = new btSequentialImpulseConstraintSolver;
-    // m_solver = sol;
-
-    // m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase,
-    //                                               m_solver,m_collisionConfiguration);
-    // m_dynamicsWorld->setDebugDrawer(&sDebugDrawer);
-    // m_dynamicsWorld->getSolverInfo().m_splitImpulse=true;
-    // m_dynamicsWorld->getSolverInfo().m_numIterations = 20;
-    // m_dynamicsWorld->getDispatchInfo().m_useContinuous = m_ccdMode == USE_CCD;
-    // m_dynamicsWorld->setGravity(btVector3(0,-10,0));
-
-    // // Create the ground
-    // // We can also use DemoApplication::localCreateRigidBody, but for clarity
-    // // it is provided here:
-    // {
-    //     /// Create the shape for the ground
-    //     btBoxShape* box = new btBoxShape(btVector3(btScalar(110.),
-    //                                                btScalar(1.),
-    //                                                btScalar(110.)));
-    //     btCollisionShape* groundShape = box;
-    //     //m_collisionShapes.push_back(groundShape);
-    //     btScalar mass(0.);
-    //     btVector3 localInertia(0,0,0);
-    //     btTransform groundTransform;
-    //     groundTransform.setIdentity();
-        
-    //     // using motionstate is recommended, it provides interpolation
-    //     // capabilities, and only synchronizes 'active' objects
-    //     btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
-    //     btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState,
-    //                                                     groundShape,localInertia);
-    //     btRigidBody* body = new btRigidBody(rbInfo);
-    //     body->setRestitution(.8);
-
-    //     // add the body to the dynamics world
-    //     m_dynamicsWorld->addRigidBody(body);
-    // }
-
     btVector3 localInertia(0,0,0);
     btCollisionShape* boxShape = new btBoxShape(btVector3(1,1,1));
-    //m_collisionShapes.push_back(boxShape);
     boxShape->calculateLocalInertia(1.0f, localInertia);
-
-    // ///  Create Dynamic Objects
-    // {
-    //     btScalar mass{5.f};
-    //     m_rocketMesh = new StlMesh("../models/object.stl");
-        
-    //     btVector3 localInertia(0,0,0);
-    //     btGImpactMeshShape *rocketShape = new btGImpactMeshShape(m_rocketMesh);
-    //     rocketShape->updateBound();
-    //     rocketShape->calculateLocalInertia(mass, localInertia);
-        
-    //     btVector3 pos(0,10,-5);
-    //     btQuaternion rot(0,0,0,1);
-    //     btTransform trans;
-    //     trans.setIdentity();
-    //     trans.setOrigin(pos);
-    //     //trans.setRotation(rot);
-    //     btDefaultMotionState *myMotionState = new btDefaultMotionState(trans);
-    //     btRigidBody::btRigidBodyConstructionInfo cInfo(mass, myMotionState,
-    //                                                    rocketShape, localInertia);
-    //     btRigidBody *body = new btRigidBody(cInfo);
-    //     body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
-    //     m_dynamicsWorld->addRigidBody(body);
-    //     body->setRestitution(0.1);
-    //     m_rocket = body;
-    // }
 }
 
 void CcdPhysicsDemo::clientResetScene() {
-    exitPhysics();
-    initPhysics();
 }
 
 void CcdPhysicsDemo::keyboardCallback(unsigned char key, int x, int y) {
-    if (key=='p') {
-        switch (m_ccdMode) {
-        case USE_CCD: {
-            m_ccdMode = USE_NO_CCD;
-            break;
-        }
-        case USE_NO_CCD:
-        default: {
-            m_ccdMode = USE_CCD;
-        }
-        };
-        clientResetScene();
-    } else {
-        DemoApplication::keyboardCallback(key,x,y);
-    }
+    DemoApplication::keyboardCallback(key,x,y);
 }
 
 
@@ -264,40 +129,11 @@ void CcdPhysicsDemo::shootBox(const btVector3& destination) {
         body->setAngularVelocity(btVector3(0,0,0));
         body->setContactProcessingThreshold(1e30);
 
-        /// when using m_ccdMode, disable regular CCD
-        if (m_ccdMode==USE_CCD) {
-            body->setCcdMotionThreshold(CUBE_HALF_EXTENTS);
-            body->setCcdSweptSphereRadius(0.4f);
-        }
+        body->setCcdMotionThreshold(CUBE_HALF_EXTENTS);
+        body->setCcdSweptSphereRadius(0.4f);
     }
 }
 
 void CcdPhysicsDemo::exitPhysics() {
-    // cleanup in the reverse order of creation/initialization
-
-    // remove the rigidbodies from the dynamics world and delete them
-    // for (int i = m_dynamicsWorld->getNumCollisionObjects()-1; i != 0 ; --i) {
-    //     btCollisionObject* obj = m_dynamicsWorld->getCollisionObjectArray()[i];
-    //     btRigidBody* body = btRigidBody::upcast(obj);
-    //     if (body && body->getMotionState()) {
-    //         delete body->getMotionState();
-    //     }
-    //     m_dynamicsWorld->removeCollisionObject( obj );
-    //     delete obj;
-    // }
-
-    // delete collision shapes
-    // for (int j=0;j<m_collisionShapes.size();j++) {
-    //     btCollisionShape* shape = m_collisionShapes[j];
-    //     delete shape;
-    // }
-    // m_collisionShapes.clear();
-
-    // delete m_dynamicsWorld;
-    // delete m_solver;
-    // delete m_broadphase;
-    // delete m_dispatcher;
-    // delete m_collisionConfiguration;
-    delete m_rocketMesh;
 }
 

@@ -22,11 +22,12 @@ class OpenGLObject {
     void draw(Pose* pose);
     OpenGLObject(std::vector<btVector3*> polygons);
 };
+
 #else
 class OpenGLObject {
     public:
-    void draw(Pose* pose) {}
-    OpenGLObject(std::vector<btVector3*> polygons) {}
+    //void draw(Pose* pose) { }
+    //OpenGLObject(std::vector<btVector3*> polygons) { }
 };
 #endif
 

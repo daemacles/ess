@@ -42,7 +42,9 @@ class BinaryReader {
 };
 
 StlMesh::StlMesh(const string &filename, bool removeDuplicateVertices):
-    btTriangleMesh () {
+    btTriangleMesh (),
+    openglobj(nullptr)
+{
     ifstream is;
     is.open(filename, ios::binary);
 
@@ -77,7 +79,7 @@ StlMesh::StlMesh(const string &filename, bool removeDuplicateVertices):
             btVector3 v2(x,z,y);
             uint16_t attribute_bytes = reader.next<uint16_t>();
             reader.setPos(reader.getPos() + attribute_bytes);
-            addTriangle(v0, v1, v2, false);
+            addTriangle(v0, v1, v2, removeDuplicateVertices);
         }
     } catch (int e) {
         if (e == 20) {
@@ -87,7 +89,9 @@ StlMesh::StlMesh(const string &filename, bool removeDuplicateVertices):
         }
     }
 
+#ifndef PHYS_DEMO    
     this->openglobj = new OpenGLObject(polygons);
+#endif
 }
 
 StlMesh::~StlMesh() {

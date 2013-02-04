@@ -27,7 +27,7 @@ class Entity {
 
     protected:
     virtual void initRigidBody (btScalar mass, btCollisionShape *shape,
-                                btTransform *trans = nullptr);
+                                const btTransform &trans = btTransform::getIdentity());
 };
 
 #endif

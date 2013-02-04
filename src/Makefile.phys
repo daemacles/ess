@@ -1,10 +1,12 @@
+OPTIMIZE = -O2
 CC = g++-4.7
-CFLAGS = $(OPTIMIZE) -std=c++11 -Wall -g -I. -I../src \
-         $(shell pkg-config bullet --cflags) -DPHYS_DEMO
+CFLAGS = $(OPTIMIZE) -std=c++11 -g -Wall -I. -I../src \
+         $(shell pkg-config bullet --cflags) -DPHYS_DEMO -pedantic -Wextra \
+	 -Winit-self -Wc++11-compat
+
 CLIBS = -L. -lOpenGLSupport $(shell pkg-config bullet --libs) \
         -lm -lGL -lGLU -lglut 
 SRCS =  phys_main.cpp \
-	CcdPhysicsDemo.cpp \
 	stlmesh.cpp \
 	simulator.cpp \
 	entityhandler.cpp \
@@ -13,9 +15,9 @@ SRCS =  phys_main.cpp \
 	sensor.cpp \
 	shapehandler.cpp \
 	rocket.cpp \
-	ground.cpp
+	ground.cpp \
+	CcdPhysicsDemo.cpp
 OBJS =  phys_main.o \
-	CcdPhysicsDemo.o \
 	stlmesh.o \
 	simulator.o \
 	entityhandler.o \
@@ -24,13 +26,15 @@ OBJS =  phys_main.o \
 	sensor.o \
 	shapehandler.o \
 	rocket.o \
-	ground.o
+	ground.o \
+	CcdPhysicsDemo.o
 
 MAKEDEPEND = gcc -M $(CFLAGS) -o $*.d $<
 
 EXE = phys_demo
 
 all: $(EXE)
+	$(CC) --version
 	global -u # run incremental update
 
 run: $(EXE)
@@ -51,6 +55,6 @@ $(EXE): $(OBJS)
 
 clean:
 	rm -f *.o
-	rm -f *.P
+#	rm -f *.P
 	rm -f $(EXE)
 # DO NOT DELETE

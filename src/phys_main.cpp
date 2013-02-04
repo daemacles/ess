@@ -17,6 +17,7 @@
 */
 
 #include <cstdio>
+#include <iostream>
 #include <cmath>
 #include <btBulletDynamicsCommon.h>
 #include "CcdPhysicsDemo.h"
@@ -37,19 +38,16 @@ int main(int argc, char **argv)
 {
     EntityHandler entities;
     Simulator sim(&entities);
+    std::cout << entities.staticEnts["ground"]->getRigidBody() << std::endl;
     
+    // Hook up the simulator tick callback. 
     btDynamicsWorld *world = sim.getDynamicsWorld();
-    
-    CcdPhysicsDemo* ccdDemo = new CcdPhysicsDemo();
-    ccdDemo->setDynamicsWorld(world);
-    ccdDemo->initPhysics();
-    world->setDebugDrawer(&gDebugDrawer);
     world->setInternalTickCallback(simCallback, static_cast<void*>(&sim));
-    
-    glutmain(argc, argv, 640, 480,
-             "Bullet Physics Demo. http://bulletphysics.com", ccdDemo);
 
-    if (argc == 2) {
+    for (int i = 0; i != 80; ++i)
+        world->stepSimulation(1./60.);
+
+    if (argc == 2 && argv[1][0] == 'v') {
         printf ("timestamp x y z phi theta psi\n");
         Rocket *rocket = static_cast<Rocket*>(entities.dynamicEnts.at("rocket"));
         auto &poseHistory = rocket->getPoseHistory();
@@ -69,7 +67,17 @@ int main(int argc, char **argv)
                    phi, theta, psi);
         }
     }
-    printf("Program finished, bye!\n");
+    
+    CcdPhysicsDemo* ccdDemo = new CcdPhysicsDemo();
+    ccdDemo->setDynamicsWorld(world);
+    ccdDemo->initPhysics();
+    world->setDebugDrawer(&gDebugDrawer);
+    
+    glutmain(argc, argv, 640, 480,
+             "Bullet Physics Demo. http://bulletphysics.com", ccdDemo);
     delete ccdDemo;
+
+
+    printf("Program finished, bye!\n");
     return 0;
 }

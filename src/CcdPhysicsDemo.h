@@ -38,19 +38,6 @@ class btDefaultCollisionConfiguration;
 class CcdPhysicsDemo : public PlatformDemoApplication
 {
     private:
-    // keep the collision shapes, for deletion/cleanup
-    // btAlignedObjectArray<btCollisionShape*> m_collisionShapes;
-    // btBroadphaseInterface	           *m_broadphase;
-    // btCollisionDispatcher	           *m_dispatcher;
-    // btConstraintSolver	                   *m_solver;
-    // btDefaultCollisionConfiguration        *m_collisionConfiguration;
-    btRigidBody                            *m_rocket;
-    StlMesh                                *m_rocketMesh;
-
-    enum { USE_CCD=1,
-           USE_NO_CCD
-    };
-    
     int m_ccdMode;
 
     public:

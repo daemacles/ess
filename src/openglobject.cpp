@@ -57,7 +57,7 @@ void OpenGLObject::draw(Pose* pose) {
     glTranslatef(pose->worldTransform.getOrigin().x(), pose->worldTransform.getOrigin().y(), pose->worldTransform.getOrigin().z());
     glRotatef(this->ff, pose->worldTransform.getOrigin().x() + 1, pose->worldTransform.getOrigin().y(), pose->worldTransform.getOrigin().z());
     this->ff += 1;
-    printf("A\n");
+
     glBegin(GL_TRIANGLES);
 
     for(auto vec : this->polygons) {

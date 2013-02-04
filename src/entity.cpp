@@ -29,16 +29,9 @@ Pose& Entity::getPose() {
     return pose;
 }
 
-void Entity::initRigidBody (btScalar mass, btCollisionShape *shape, btTransform *trans) {
-    // Create a default transform if one is not provided to us
-    if (trans == nullptr) {
-        btTransform t;
-        t.setIdentity();
-        t.setOrigin(btVector3(0,0,0));
-        trans = &t;
-    }
-    
-    btDefaultMotionState *myMotionState = new btDefaultMotionState(*trans);
+void Entity::initRigidBody (btScalar mass, btCollisionShape *shape,
+                            const btTransform &trans) {
+    btDefaultMotionState *myMotionState = new btDefaultMotionState(trans);
     btVector3 localInertia(0,0,0);
     if (mass != 0.0)
         shape->calculateLocalInertia(mass, localInertia);

@@ -16,7 +16,7 @@ Rocket::Rocket (btVector3 startPos, btScalar mass) {
     trans.setIdentity();
     trans.setOrigin(startPos);
   
-    initRigidBody(5.0, rocketShape, &trans);
+    initRigidBody(mass, rocketShape, trans);
 }
     
 void Rocket::update (btScalar timeStep, btScalar time) {
