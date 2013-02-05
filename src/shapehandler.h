@@ -35,19 +35,25 @@ class ShapeHandler {
 
     StlMesh *getMesh(std::string name);
 
-    ///
     /// \param name handle for this shape
     /// \param filename binary STL mesh data for this mesh
-    void addMesh (std::string name, std::string filename);
+    /// \param dynamicMesh if true, uses btGImpactMeshShape, else a
+    ///        btBvhTriangleMeshShape
+    void addMesh (std::string name, std::string filename, bool dynamicMesh=true);
 
-    // name - handle for this shape
-    // extents - x: width, y: height, z: length
+    /// \param name handle for this shape
+    /// \param filename binary STL mesh data for this mesh
+    void addConvexHull (std::string name, std::string filename);
+    
+    // \param name handle for this shape
+    // \param extents where x=width, y=height, z=length
     void addBox (std::string name, btVector3 extents);
 
     bool hasShape(std::string name);
 
     private:
     ShapeHandler () {}
+    void addShape(std::string &name, btCollisionShape *shape);
 };
 
 #endif

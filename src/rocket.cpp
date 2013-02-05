@@ -4,7 +4,8 @@ Rocket::Rocket (btVector3 startPos, btScalar mass) {
     ShapeHandler *sh = ShapeHandler::getHandler();
     if (!sh->hasShape("rocket01")) {
         // Load in the shapes to be used
-        sh->addMesh("rocket01", "../models/rocket01.stl");
+        // sh->addMesh("rocket01", "../models/rocket01.stl", true);
+        sh->addConvexHull("rocket01", "../models/rocket01.stl");
     }
     
     btCollisionShape *rocketShape = sh->getShape("rocket01");
@@ -27,7 +28,7 @@ void Rocket::update (btScalar timeStep, btScalar time) {
     Entity::update(timeStep, time);   
 
     // Bouncing rocket
-    float height = 5.0f;
+    float height = -7.0f;
     float maxThrust = 20.0f;
     rigidBody->setActivationState(ACTIVE_TAG);
     auto ori = rigidBody->getOrientation();

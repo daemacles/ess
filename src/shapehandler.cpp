@@ -1,4 +1,5 @@
 #include <BulletCollision/Gimpact/btGImpactShape.h>
+#include <BulletCollision/CollisionShapes/btShapeHull.h>
 
 #include "stlmesh.h"
 #include "shapehandler.h"
@@ -30,23 +31,60 @@ StlMesh* ShapeHandler::getMesh (std::string name) {
 // could use smart pointers?
 
 // Loads a mesh from disk in STL format and creates a shape from it.
-void ShapeHandler::addMesh (std::string name, std::string filename) {
+void ShapeHandler::addMesh (std::string name, std::string filename,
+                            bool isDynamic) {
     // Load the mesh from disk and save it in the meshes map
     StlMesh *mesh = new StlMesh(filename);
-    btGImpactMeshShape *shape = new btGImpactMeshShape(mesh);
-    shape->updateBound();
+    btCollisionShape *shape;
+    if (isDynamic) {
+        btGImpactMeshShape *m = new btGImpactMeshShape(mesh);
+        m->updateBound();
+        shape = m;
+    }
+    else {
+        btBvhTriangleMeshShape *t = new btBvhTriangleMeshShape(mesh, true);
+        shape = t;
+    }
 
-    shapes[name] = shape;
+    addShape(name, shape);
     meshes[shape] = mesh;
 }
 
 void ShapeHandler::addBox (std::string name, btVector3 extents) {
     btBoxShape *box = new btBoxShape(extents);
-    shapes[name] = box;
+    addShape(name, box);
+}
+
+void ShapeHandler::addConvexHull (std::string name, std::string filename) {
+    /// THIS IS FOR A CONVEX HULL
+    StlMesh *mesh = new StlMesh(filename);
+    
+    btConvexShape* tmpConvexShape = new btConvexTriangleMeshShape(mesh);
+ 
+    // create a hull approximation
+    btShapeHull* hull = new btShapeHull(tmpConvexShape);
+    btScalar margin = tmpConvexShape->getMargin();
+    hull->buildHull(margin);
+    tmpConvexShape->setUserPointer(hull);
+  
+    btConvexHullShape* convexShape = new btConvexHullShape();
+    for (int i=0;i<hull->numVertices();i++) {
+        convexShape->addPoint(hull->getVertexPointer()[i]); 
+    }
+
+    delete tmpConvexShape;
+    delete hull;
+
+    addShape(name, convexShape);
+    meshes[convexShape] = mesh;
 }
 
 bool ShapeHandler::hasShape(std::string name) {
     return shapes.find(name) != shapes.end();
+}
+
+void ShapeHandler::addShape(std::string &name, btCollisionShape *shape) {
+    shapes[name] = shape;
 }
 
 ShapeHandler::~ShapeHandler () {

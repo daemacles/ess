@@ -27,8 +27,27 @@
 
 #include "simulator.h"
 #include "rocket.h"
+#include "pose.h"
+#include "sensor.h"
+#include "gyrosensor.h"
 
 GLDebugDrawer gDebugDrawer;
+
+void printPose(Pose &pose) {
+    btVector3 position = pose.worldTransform.getOrigin();
+    btQuaternion q = pose.worldTransform.getRotation();
+    double q0 = q.x();
+    double q1 = q.y();
+    double q2 = q.z();
+    double q3 = q.w();
+    double phi = atan2(2*(q0*q1 + q2*q3), 1 - 2*(q1*q1 + q2*q2));
+    double theta = asin(2*(q0*q2 - q3*q1));
+    double psi = atan2(2*(q0*q3 + q1*q2), 1 - 2*(q2*q2 + q3*q3));
+    printf("%9.4f %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",
+           pose.timestamp,
+           position.getX(), position.getY(), position.getZ(),
+           phi, theta, psi);
+}
 
 #ifndef PHYS_DEMO
 int phys_main(int argc, char **argv)
@@ -44,39 +63,28 @@ int main(int argc, char **argv)
     btDynamicsWorld *world = sim.getDynamicsWorld();
     world->setInternalTickCallback(simCallback, static_cast<void*>(&sim));
 
-    for (int i = 0; i != 80; ++i)
-        world->stepSimulation(1./60.);
-
     if (argc == 2 && argv[1][0] == 'v') {
-        printf ("timestamp x y z phi theta psi\n");
         Rocket *rocket = static_cast<Rocket*>(entities.dynamicEnts.at("rocket"));
-        auto &poseHistory = rocket->getPoseHistory();
-        for (auto &pose : poseHistory) {
-            btVector3 position = pose.worldTransform.getOrigin();
-            btQuaternion q = pose.worldTransform.getRotation();
-            double q0 = q.x();
-            double q1 = q.y();
-            double q2 = q.z();
-            double q3 = q.w();
-            double phi = atan2(2*(q0*q1 + q2*q3), 1 - 2*(q1*q1 + q2*q2));
-            double theta = asin(2*(q0*q2 - q3*q1));
-            double psi = atan2(2*(q0*q3 + q1*q2), 1 - 2*(q2*q2 + q3*q3));
-            printf("%9.4f %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",
-                   pose.timestamp,
-                   position.getX(), position.getY(), position.getZ(),
-                   phi, theta, psi);
+        //GyroSensor *gyro = static_cast<GyroSensor*>(entities.sensors["gyro"]);
+        printf ("timestamp x y z phi theta psi\n");
+        for (int i = 0; i != 80; ++i) {
+            world->stepSimulation(1./60.);
+            auto pose = rocket->getPose();
+            printPose(pose);
+            //auto &angvel = gyro->getValue();
+            //printf ("%9.4f %8.3f %8.3f %8.3f\n", gyro->getTimestamp(), angvel.x(), angvel.y(), angvel.z());
         }
+    } else {
+    
+        CcdPhysicsDemo* ccdDemo = new CcdPhysicsDemo();
+        ccdDemo->setDynamicsWorld(world);
+        ccdDemo->initPhysics();
+        world->setDebugDrawer(&gDebugDrawer);
+    
+        glutmain(argc, argv, 640, 480,
+                 "Bullet Physics Demo. http://bulletphysics.com", ccdDemo);
+        delete ccdDemo;
     }
-    
-    CcdPhysicsDemo* ccdDemo = new CcdPhysicsDemo();
-    ccdDemo->setDynamicsWorld(world);
-    ccdDemo->initPhysics();
-    world->setDebugDrawer(&gDebugDrawer);
-    
-    glutmain(argc, argv, 640, 480,
-             "Bullet Physics Demo. http://bulletphysics.com", ccdDemo);
-    delete ccdDemo;
-
 
     printf("Program finished, bye!\n");
     return 0;

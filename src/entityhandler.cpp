@@ -5,6 +5,7 @@
 #include "entity.h"
 #include "ground.h"
 #include "rocket.h"
+#include "gyrosensor.h"
 
 EntityHandler::EntityHandler () {
     init();
@@ -13,8 +14,9 @@ EntityHandler::EntityHandler () {
 // TODO: convert to use a config file instead of hard coding what to load.
 void EntityHandler::init () {
     // Create the rigid bodies
-    staticEnts["ground"] = new Ground();
-    dynamicEnts["rocket"] = new Rocket();
+    addStatic("ground", new Ground());
+    addDynamic("rocket", new Rocket());
+    addSensor("gyro", new GyroSensor("Rocket gyro", dynamicEnts["rocket"]));
 }    
 
 void EntityHandler::callUpdates (btScalar timeStep, btScalar time) {
