@@ -41,7 +41,7 @@ void Rocket::update (btScalar timeStep, btScalar time) {
     btVector3 impulse = thrust.rotate(ori.getAxis(), ori.getAngle());
     impulse *= impulseStrength;
     btVector3 relPos(0,0,0);
-    rigidBody->applyImpulse(impulse,relPos);    
+    //rigidBody->applyImpulse(impulse,relPos);    
 }
 
 std::vector<Pose>& Rocket::getPoseHistory() {

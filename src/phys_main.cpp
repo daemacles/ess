@@ -58,28 +58,25 @@ int main(int argc, char **argv)
     EntityHandler entities;
     Simulator sim(&entities);
     std::cout << entities.staticEnts["ground"]->getRigidBody() << std::endl;
-    
-    // Hook up the simulator tick callback. 
-    btDynamicsWorld *world = sim.getDynamicsWorld();
-    world->setInternalTickCallback(simCallback, static_cast<void*>(&sim));
-
+   
     if (argc == 2 && argv[1][0] == 'v') {
         Rocket *rocket = static_cast<Rocket*>(entities.dynamicEnts.at("rocket"));
-        //GyroSensor *gyro = static_cast<GyroSensor*>(entities.sensors["gyro"]);
+        // GyroSensor *gyro = static_cast<GyroSensor*>(entities.sensors["gyro"]);
         printf ("timestamp x y z phi theta psi\n");
         for (int i = 0; i != 80; ++i) {
-            world->stepSimulation(1./60.);
+            sim.stepSimulation(1./60.);
             auto pose = rocket->getPose();
             printPose(pose);
-            //auto &angvel = gyro->getValue();
-            //printf ("%9.4f %8.3f %8.3f %8.3f\n", gyro->getTimestamp(), angvel.x(), angvel.y(), angvel.z());
+            // auto &angvel = gyro->getValue();
+            // printf ("%9.4f %8.3f %8.3f %8.3f\n", gyro->getTimestamp(),
+            //         angvel.x(), angvel.y(), angvel.z());
         }
     } else {
     
         CcdPhysicsDemo* ccdDemo = new CcdPhysicsDemo();
-        ccdDemo->setDynamicsWorld(world);
+        ccdDemo->setDynamicsWorld(sim.getDynamicsWorld());
         ccdDemo->initPhysics();
-        world->setDebugDrawer(&gDebugDrawer);
+        sim.getDynamicsWorld()->setDebugDrawer(&gDebugDrawer);
     
         glutmain(argc, argv, 640, 480,
                  "Bullet Physics Demo. http://bulletphysics.com", ccdDemo);

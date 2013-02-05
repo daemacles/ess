@@ -13,16 +13,20 @@ EntityHandler::EntityHandler () {
 
 // TODO: convert to use a config file instead of hard coding what to load.
 void EntityHandler::init () {
-    // Create the rigid bodies
+    // Bring life forth into the world!
     addStatic("ground", new Ground());
     addDynamic("rocket", new Rocket());
     addSensor("gyro", new GyroSensor("Rocket gyro", dynamicEnts["rocket"]));
 }    
 
-void EntityHandler::callUpdates (btScalar timeStep, btScalar time) {
+void EntityHandler::callUpdates (btScalar delta_t, btScalar time) {
     for (auto pr : dynamicEnts) {
         auto ent = pr.second;
-        ent->update(timeStep, time);
+        ent->update(delta_t, time);
+    }
+    for (auto pr : sensors) {
+        auto sensor = pr.second;
+        sensor->update(time);
     }
 }
 

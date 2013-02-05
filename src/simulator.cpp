@@ -35,6 +35,10 @@ Simulator::Simulator (EntityHandler *_ents):
     dynamicsWorld->getDispatchInfo().m_useContinuous = 1;
     dynamicsWorld->setGravity(btVector3(0, -9.8, 0));
 
+    // Hook up our callback
+    dynamicsWorld->setInternalTickCallback(simCallback, static_cast<void*>(this));
+    
+
     // Add all entities to our dynamics world, starting with the static
     // things.
     for (auto pr : entities->staticEnts) {
@@ -54,9 +58,14 @@ Simulator::Simulator (EntityHandler *_ents):
     }
 }
 
-void Simulator::callback (btScalar timeStep) {
-    elapsedTime += timeStep;
-    entities->callUpdates(timeStep, elapsedTime);
+void Simulator::stepSimulation (btScalar delta_t) {
+    dynamicsWorld->stepSimulation(delta_t);
+}
+
+
+void Simulator::callback (btScalar delta_t) {
+    elapsedTime += delta_t;
+    entities->callUpdates(delta_t, elapsedTime);
 }
 
 btDynamicsWorld* Simulator::getDynamicsWorld () {

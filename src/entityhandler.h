@@ -26,7 +26,7 @@ class EntityHandler {
     void addStatic  (std::string name, Entity* e) { staticEnts[name] = e; }
     void addSensor  (std::string name, Sensor* e) { sensors[name] = e; }
 
-    void callUpdates (btScalar timeStep, btScalar time);
+    void callUpdates (btScalar delta_t, btScalar time);
 };
 
 #endif
