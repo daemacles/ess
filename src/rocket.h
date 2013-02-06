@@ -12,7 +12,7 @@ class Rocket : public Entity {
     std::vector<Pose> poseHistory;
 
     public:
-    Rocket (btVector3 startPos = btVector3(0,0,0),
+    Rocket (btVector3 startPos = btVector3(0,1,-1),
             btScalar mass = 5.0);
 
     void update (btScalar timeStep, btScalar time);

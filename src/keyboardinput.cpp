@@ -13,7 +13,10 @@ bool KeyboardInput::eventFilter(QObject *obj, QEvent *event)
         switch(KeyEvent->key())
         {
             case Qt::Key_Up:
+                Rocket* rocket = static_cast<Rocket*>(entityHandler->dynamicEnts["rocket"]);
+                    /*
                 for(auto o : this->entityHandler->dynamicEnts) {
+
                     Entity* e = o.second;
                     Pose& p = e->getPose();
 
@@ -24,6 +27,7 @@ bool KeyboardInput::eventFilter(QObject *obj, QEvent *event)
                     p.worldTransform.setOrigin(vec);
 
                 }
+                    */
                 return false;
             default:
                 break;

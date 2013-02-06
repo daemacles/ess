@@ -62,19 +62,19 @@ void OpenGLObject::draw(Pose& pose) {
     //}
 
     glPushMatrix();
-    //glRotatef(pose.worldTransform.x(), pose.worldTransform.y(), pose.worldTransform.z(), 45);
     //pose.worldTransform.getOpenGLMatrix(mat);
     //glTranslatef(pose.worldTransform.getOrigin().x(), pose.worldTransform.getOrigin().y(), pose.worldTransform.getOrigin().z());
     //
     //
 
     glTranslatef(pose.worldTransform.getOrigin().x(), pose.worldTransform.getOrigin().y(), pose.worldTransform.getOrigin().z());
+    glTranslatef(0, -8, 0);
 
     printf("%f,%f,%f\n", pose.worldTransform.getOrigin().x(), pose.worldTransform.getOrigin().y(), pose.worldTransform.getOrigin().z());
     
     btQuaternion quat = pose.worldTransform.getRotation();
     btVector3 axis = quat.getAxis();
-    glRotatef(quat.getAngle(), axis.x(), axis.y(), axis.z());
+    glRotatef(quat.getAngle()*57, axis.x(), axis.y(), axis.z());
 
     //printf("%f,%f,%f,%f\n", quat.getAngle(), axis.x(), axis.y(), axis.z());
 
