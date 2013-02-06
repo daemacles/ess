@@ -55,7 +55,8 @@ void OpenGLObject::draw(Pose* pose) {
     //glRotatef(pose->worldTransform.x(), pose->worldTransform.y(), pose->worldTransform.z(), 45);
     //pose->worldTransform.getOpenGLMatrix(mat);
     glTranslatef(pose->worldTransform.getOrigin().x(), pose->worldTransform.getOrigin().y(), pose->worldTransform.getOrigin().z());
-    glRotatef(this->ff, pose->worldTransform.getOrigin().x() + 1, pose->worldTransform.getOrigin().y(), pose->worldTransform.getOrigin().z());
+    //glRotatef(this->ff, pose->worldTransform.getOrigin().x() + 1, pose->worldTransform.getOrigin().y(), pose->worldTransform.getOrigin().z());
+    glRotatef(0, 1, 0, 0);
     this->ff += 1;
 
     glBegin(GL_TRIANGLES);
