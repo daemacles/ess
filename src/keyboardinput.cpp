@@ -16,15 +16,13 @@ bool KeyboardInput::eventFilter(QObject *obj, QEvent *event)
                 for(auto o : this->entityHandler->dynamicEnts) {
                     Entity* e = o.second;
                     Pose& p = e->getPose();
-                    p.linForce = btVector3(
-                            100, 100, 100);
 
-                    /*
-                    p.worldTransform.setOrigin(
-                            vec
-                            );
-                            */
-                    printf("AAAAAAA\n");
+                    btVector3 vec = btVector3(
+                            p.worldTransform.getOrigin().x() - 0.01,
+                            p.worldTransform.getOrigin().y() - 0.01,
+                            p.worldTransform.getOrigin().z());
+                    p.worldTransform.setOrigin(vec);
+
                 }
                 return false;
             default:
