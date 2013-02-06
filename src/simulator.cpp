@@ -44,7 +44,7 @@ Simulator::Simulator (EntityHandler *_ents):
     for (auto pr : entities->staticEnts) {
         auto ent = pr.second;
         if (ent->getRigidBody()) {
-            std::cout << "Adding static entity " << pr.first << std::endl;
+            // std::cout << "Adding static entity " << pr.first << std::endl;
             dynamicsWorld->addRigidBody(ent->getRigidBody());
         }
     }
@@ -52,7 +52,7 @@ Simulator::Simulator (EntityHandler *_ents):
     for (auto pr : entities->dynamicEnts) {
         auto ent = pr.second;
         if (ent->getRigidBody()) {
-            std::cout << "Adding dynamic entity " << pr.first << std::endl;
+            // std::cout << "Adding dynamic entity " << pr.first << std::endl;
             dynamicsWorld->addRigidBody(ent->getRigidBody());
         }
     }

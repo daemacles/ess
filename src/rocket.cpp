@@ -1,4 +1,5 @@
 #include "rocket.h"
+#include <cmath>
 
 Rocket::Rocket (btVector3 startPos, btScalar mass) {
     ShapeHandler *sh = ShapeHandler::getHandler();
@@ -18,6 +19,8 @@ Rocket::Rocket (btVector3 startPos, btScalar mass) {
     trans.setOrigin(startPos);
   
     initRigidBody(mass, rocketShape, trans);
+
+    init();
 }
     
 void Rocket::update (btScalar timeStep, btScalar time) {
@@ -27,23 +30,118 @@ void Rocket::update (btScalar timeStep, btScalar time) {
     // Next parent's update, which will update our pose
     Entity::update(timeStep, time);   
 
-    // Bouncing rocket
-    float height = -7.0f;
-    float maxThrust = 20.0f;
     rigidBody->setActivationState(ACTIVE_TAG);
-    auto ori = rigidBody->getOrientation();
-    auto trans = rigidBody->getWorldTransform().getOrigin();
-    float error = height - trans[1];
-    if (error < 0) error = 0.0f;
-    float impulseStrength = 5.0f * error;
-    if (impulseStrength > maxThrust) impulseStrength = maxThrust;
-    btVector3 thrust(0,1,0);
-    btVector3 impulse = thrust.rotate(ori.getAxis(), ori.getAngle());
-    impulse *= impulseStrength;
-    btVector3 relPos(0,0,0);
-    //rigidBody->applyImpulse(impulse,relPos);    
+    // rigidBody->setLinearVelocity({0,0,0}); // ROCKET CAN'T MOVE!!!!
+
+    // No spinning!
+    btQuaternion ori = rigidBody->getOrientation();
+    btScalar angErr = pose.angVel.y();
+    btScalar CWSpin = 0.0;
+    btScalar CCWSpin = 0.0;
+    // if (angErr > 0.0) CWSpin = 1;
+    // if (angErr < 0.0) CCWSpin = 1;
+    // printf ("%f,%f,%f,%f,%f\n",
+    //         time,
+    //         pose.angVel.x(),
+    //         pose.angVel.y(),
+    //         pose.angVel.z(),
+    //         CCWSpin);
+    
+    // ROT1 and ROT2 spin the same direction
+    // ROT1 and ROT4 push the same direction
+    RocketControl c;
+    c.name.main1 = 0.0;
+    c.name.main2 = 0.0;
+    c.name.main3 = 0.0;
+    c.name.main4 = 0.0;
+    c.name.rot1 = CWSpin;
+    c.name.rot2 = CWSpin;
+    c.name.rot3 = CCWSpin;
+    c.name.rot4 = CCWSpin;
+    // = {0.20, 0.20, 0.20, 0.20,
+    //                    CWSpin, , 0.0, 0.0};
+    applyControl(c);
 }
 
 std::vector<Pose>& Rocket::getPoseHistory() {
     return poseHistory;
+}
+
+void Rocket::fireEngine(int n, btScalar throttle) {
+    // Clamping -- I guess we don't have afterburner.
+    if (throttle > 1.0) throttle = 1.0;
+    if (throttle < 0.0) throttle = 0.0;
+
+    // The rocket's orientation.
+    btQuaternion ori = rigidBody->getOrientation();
+
+    // The offset is given in world coordinates, which is why it is rotated by
+    // the rocket's orientation to place it in the rocket's frame of
+    // reference.
+    btVector3 offset = enginePosition[n].rotate(ori.getAxis(), ori.getAngle());
+
+    // The final rotation for the engine's thrust implicitly includes the
+    // per-engine rotation, which is relative to the rocket's frame of
+    // reference.
+    btVector3 direction = engineForce[n].rotate(ori.getAxis(), ori.getAngle());
+
+    // The impulse force is a vector of length impulseStrength along the world
+    // y axis that is then rotated by the rotation calculated earlier to bring
+    // it into the rocket's frame of reference.
+    btScalar impulseStrength = throttle * engineStrength[n];
+    btVector3 impulse = direction * impulseStrength;
+
+    // Last but not least, apply the impulse.
+    rigidBody->applyImpulse(impulse, offset);    
+}
+
+void Rocket::applyControl (const RocketControl &control) {
+    for (int i = 0; i < RocketControl::NUM_ENGINES; ++i) {
+        fireEngine(i, control.engine[i]);
+    }
+}
+
+void Rocket::init (void) {
+    // POSITIONS
+    // Main engines
+    btScalar h_off = 0.9;       // horizontal offset
+    btScalar v_off = -1.25;     // vertical offset
+    enginePosition[MAIN1] = btVector3( h_off, v_off,  0);
+    enginePosition[MAIN2] = btVector3(-h_off, v_off,  0);
+    enginePosition[MAIN3] = btVector3(0,      v_off,  h_off);
+    enginePosition[MAIN4] = btVector3(0,      v_off, -h_off);
+
+    // Rotational engines
+    h_off = 0.4;
+    v_off = 0.0;
+    enginePosition[ROT1] = btVector3( h_off, v_off, 0);
+    enginePosition[ROT2] = btVector3(-h_off, v_off, 0);
+    enginePosition[ROT3] = btVector3( h_off, v_off, 0);
+    enginePosition[ROT4] = btVector3(-h_off, v_off, 0);
+
+    // FORCES
+    // Specified as a unit vector in the direction of "push" produced by this
+    // engine.
+    engineForce[MAIN1] = btVector3(0, 1, 0).normalize();
+    engineForce[MAIN2] = btVector3(0, 1, 0).normalize();
+    engineForce[MAIN3] = btVector3(0, 1, 0).normalize();
+    engineForce[MAIN4] = btVector3(0, 1, 0).normalize();
+
+    // Because the horizontal offset of the engines are along the x-axis, the
+    // direction of their thrust must be perpendicular to this, i.e., along
+    // the z-axis.
+    engineForce[ROT1]  = btVector3(0, 0,  1).normalize();
+    engineForce[ROT2]  = btVector3(0, 0, -1).normalize();
+    engineForce[ROT3]  = btVector3(0, 0, -1).normalize();
+    engineForce[ROT4]  = btVector3(0, 0,  1).normalize();
+
+    // STRENGTHS
+    engineStrength[MAIN1] = 1.0;
+    engineStrength[MAIN2] = 1.0;
+    engineStrength[MAIN3] = 1.0;
+    engineStrength[MAIN4] = 1.0;
+    engineStrength[ROT1] = 1.0; // Presumably don't have to fight gravity that much...
+    engineStrength[ROT2] = 1.0;
+    engineStrength[ROT3] = 1.0;
+    engineStrength[ROT4] = 1.0;
 }

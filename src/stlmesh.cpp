@@ -55,7 +55,7 @@ StlMesh::StlMesh(const string &filename, bool removeDuplicateVertices):
 
     try {
         int numTriangles = reader.next<uint32_t>();
-        cout << "Found " << numTriangles << " triangles" << endl;
+        // cout << "Found " << numTriangles << " triangles" << endl;
 
         for (int i = 0; i != numTriangles; ++i) {
             btVector3 normal(reader.next<float>(),

@@ -104,7 +104,7 @@ void CcdPhysicsDemo::keyboardCallback(unsigned char key, int x, int y) {
 
 void CcdPhysicsDemo::shootBox(const btVector3& destination) {
     if (m_dynamicsWorld) {
-        float mass = 0.4f;
+        float mass = 01.0f;
         btVector3 camPos = getCameraPosition();
 
         btTransform startTransform;

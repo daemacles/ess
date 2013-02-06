@@ -17,6 +17,8 @@ void EntityHandler::init () {
     addStatic("ground", new Ground());
     addDynamic("rocket", new Rocket());
     addSensor("gyro", new GyroSensor("Rocket gyro", dynamicEnts["rocket"]));
+
+    dynamicEnts["rocket"]->getRigidBody()->setAngularVelocity({0,6,0});
 }    
 
 void EntityHandler::callUpdates (btScalar delta_t, btScalar time) {
