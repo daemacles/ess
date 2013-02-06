@@ -1,10 +1,18 @@
 #include "openglobject.h"
 #include <stdio.h>
+#include <math.h>
+
+#include    <stdio.h>                         // Header File For Standard Input/Output ( NEW )
 
 #ifndef PHYS_DEMO
 #include <QtOpenGL>
 
+void OpenGLObject::setColor(btVector3 color) {
+    this->color = color;
+}
+
 OpenGLObject::OpenGLObject(std::vector<btVector3*> polygons) {
+    this->color = btVector3(1,0,1);
     printf("OpenGLObject created with %d polygons\n", polygons.size());
     this->polygons = std::vector<btVector3*>(polygons.size());
     for(int i = 0; i < this->polygons.size(); i++) {
@@ -12,6 +20,7 @@ OpenGLObject::OpenGLObject(std::vector<btVector3*> polygons) {
         //printf("%d, %p\n", &polygons[i]);
         //glVertex3f(this->polygons[i].x(), this->polygons[i].y(), this->polygons[i].z());
     }
+    //this->textureData = rgb_tga("moon.tga", &this->texW, &this->texH);
     /*
     this->polygons.resize(3);
 
@@ -42,6 +51,7 @@ OpenGLObject::OpenGLObject(std::vector<btVector3*> polygons) {
     */
 }
 
+
 void OpenGLObject::draw(Pose* pose) {
     int ii = 0;
 
@@ -54,34 +64,32 @@ void OpenGLObject::draw(Pose* pose) {
     glPushMatrix();
     //glRotatef(pose->worldTransform.x(), pose->worldTransform.y(), pose->worldTransform.z(), 45);
     //pose->worldTransform.getOpenGLMatrix(mat);
-    glTranslatef(pose->worldTransform.getOrigin().x(), pose->worldTransform.getOrigin().y(), pose->worldTransform.getOrigin().z());
-    //glRotatef(this->ff, pose->worldTransform.getOrigin().x() + 1, pose->worldTransform.getOrigin().y(), pose->worldTransform.getOrigin().z());
-    glRotatef(0, 1, 0, 0);
-    this->ff += 1;
+    //glTranslatef(pose->worldTransform.getOrigin().x(), pose->worldTransform.getOrigin().y(), pose->worldTransform.getOrigin().z());
+    //
+    //
+
+    //glRotatef(-45, 1, 0, 0);
+    
+    
+    /*
+    btQuaternion quat = pose->worldTransform.getRotation();
+    btVector3 axis = quat.getAxis();
+    glRotatef(quat.getAngle(), axis.x(), axis.y(), axis.z());
+    printf("%f\n", pose->worldTransform.getRotation().angle(btQuaternion(btVector3(0,1,0),0))*57.0);
+    */
 
     glBegin(GL_TRIANGLES);
 
     for(auto vec : this->polygons) {
+        //glTexCoord2f(sin(vec->x()), sin(vec->y()));
+        //glColor3f(this->color.x(), this->color.y(), this->color.z());
         glVertex3f(vec->x(), vec->y(), vec->z());
     }
+    //printf("[%d,%d,%d]\n", vec->x(), vec->y(), vec->z());
 
     glEnd();
 
     glPopMatrix();
     return;
-
-    /*
-    glClearColor(1.0, 1.0, 0.0, 1.0);
-    //glClear(GL_COLOR_BUFFER_BIT);
-    //glLoadIdentity();
-    //glTranslatef(0.0, 0.0, -5.0);
-    glBegin(GL_QUADS);
-    glVertex3f(-1.0f, 1.0f, 0.0f);
-    glVertex3f(1.0f, 0.5f, 0.0f);
-    glVertex3f(1.0f, -1.0f, 0.0f);
-    glEnd();
-
-    glFlush();
-    */
 }
 #endif
