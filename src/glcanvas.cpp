@@ -27,9 +27,9 @@ GLCanvas::~GLCanvas()
 }
 
 void GLCanvas::beginDraw() {
-#define ZOOM_1 10.0
+#define ZOOM_1 20.0
     glMatrixMode(GL_PROJECTION);
-    glOrtho(-ZOOM_1, ZOOM_1, -ZOOM_1, ZOOM_1, 0.0, 10);
+    glOrtho(-ZOOM_1, ZOOM_1, -ZOOM_1, ZOOM_1, 0.0, 100);
 
     glMatrixMode(GL_MODELVIEW);
 
