@@ -26,7 +26,6 @@ class GLCanvas : public QGLWidget
         public slots:
             void beginDraw();
             void endDraw();
-            void draw();
 
     private:
         QPoint anchor;
