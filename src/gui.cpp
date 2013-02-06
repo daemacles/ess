@@ -12,6 +12,7 @@
 #include "entityhandler.h"
 #include "glcanvas.h"
 #include "openglobject.h"
+#include "keyboardinput.h"
 
 float ff = 0.0;
 
@@ -28,16 +29,17 @@ GUI::GUI(EntityHandler* entityhandler, Simulator* sim) {
 }
 
 QWidget* GUI::setupSensors() {
+    /*
     QWidget* sensorList = new QWidget;
     QVBoxLayout* sensorListLayout = new QVBoxLayout;
     sensorList->setLayout(sensorListLayout);
     sensorListLayout->addWidget(new QLabel("Sensors"));
 
-    /*
-    std::vector<Sensor*> sim_sensors = this->simulator->getSensors();
+    std::map<std::string, Sensor*> sensors;
 
-    for(std::vector<Sensor*>::iterator it = sim_sensors.begin(); it != sim_sensors.end(); ++it) {
-        Sensor* s = *it;
+    for(auto o : sensors) {
+        Sensor* s = o.second;
+
         QWidget* sensorRow = new QWidget;
         QHBoxLayout* sensorRowLayout = new QHBoxLayout;
         sensorRow->setLayout(sensorRowLayout);
@@ -51,12 +53,20 @@ QWidget* GUI::setupSensors() {
 
         sensorListLayout->addWidget(sensorRow);
     }
+
+    std::vector<Sensor*> sim_sensors = this->simulator->getSensors();
+
+    for(std::vector<Sensor*>::iterator it = sim_sensors.begin(); it != sim_sensors.end(); ++it) {
+        Sensor* s = *it;
+
+    }
+    return sensorList;
     */
 
-    return sensorList;
 }
 
 void GUI::setup() {
+
     QWidget* window = this;
 
     // GL screen widget
@@ -94,21 +104,48 @@ void GUI::setup() {
 }
 
 void GUI::draw() {
+    this->simulator->stepSimulation(1./60.);
 
     //glCanvas->resize(700,500);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    //glDisable( GL_LIGHTING );                   // Turn Off Lighting
     //glCanvas->draw();
     //
     //OpenGLObject* globj = new OpenGLObject(NULL);
     //
+    /*
+    glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION ) ;
+   glEnable ( GL_COLOR_MATERIAL ) ;
+    glEnable(GL_LIGHT1);
+    */
 
-    printf("BBBB\n");
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+
+    GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+    GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
+    GLfloat specularLight[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+    GLfloat position[] = { -1.5f, 1.0f, -4.0f, 1.0f };
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
+    glLightfv(GL_LIGHT0, GL_POSITION, position);
+
+    glColor3f ( 1.0f, 0.0f, 0.0f ) ;
+    for(auto o : this->entityHandler->staticEnts) {
+        Entity* e = o.second;
+        e->getOpenGLObject()->draw(&e->getPose());
+    }
+    glColor3f ( 0.0f, 1.0f, 0.0f ) ;
     for(auto o : this->entityHandler->dynamicEnts) {
         Entity* e = o.second;
         e->getOpenGLObject()->draw(&e->getPose());
-        ff += 1;
     }
+
+
     //draw_entity_openglob(this->entityHandler->getEntities()[0]);
     //this->entityHandler->getEntities()[0]->getOpenGLObject()->draw(0,0,0);
 
@@ -116,5 +153,17 @@ void GUI::draw() {
 
     this->glCanvas->endDraw();
 
+    /*
+    glPushAttrib( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_POLYGON_BIT | GL_STENCIL_BUFFER_BIT );
+    glDepthMask( GL_FALSE );                    // Turn Off Writing To The Depth-Buffer
+    glDepthFunc( GL_LEQUAL );
+    glEnable( GL_STENCIL_TEST );                    // Turn On Stencil Buffer Testing
+    glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );      // Don't Draw Into The Colour Buffer
+    glStencilFunc( GL_ALWAYS, 1, 0xFFFFFFFFL );
+    */
+
     this->glCanvas->updateGL();
+
+    QCoreApplication::instance()->installEventFilter(new KeyboardInput(this->entityHandler));
 }
+
