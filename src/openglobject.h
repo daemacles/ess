@@ -23,7 +23,7 @@ class OpenGLObject {
     public:
         void setColor(btVector3 color);
         std::vector<btVector3*> polygons;
-        void draw(Pose* pose);
+        void draw(Pose& pose);
         OpenGLObject(std::vector<btVector3*> polygons);
 
 };

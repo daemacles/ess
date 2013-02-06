@@ -52,7 +52,7 @@ OpenGLObject::OpenGLObject(std::vector<btVector3*> polygons) {
 }
 
 
-void OpenGLObject::draw(Pose* pose) {
+void OpenGLObject::draw(Pose& pose) {
     int ii = 0;
 
     //for(int i = 0; i < sizee; i++) {
@@ -62,21 +62,23 @@ void OpenGLObject::draw(Pose* pose) {
     //}
 
     glPushMatrix();
-    //glRotatef(pose->worldTransform.x(), pose->worldTransform.y(), pose->worldTransform.z(), 45);
-    //pose->worldTransform.getOpenGLMatrix(mat);
-    //glTranslatef(pose->worldTransform.getOrigin().x(), pose->worldTransform.getOrigin().y(), pose->worldTransform.getOrigin().z());
+    //glRotatef(pose.worldTransform.x(), pose.worldTransform.y(), pose.worldTransform.z(), 45);
+    //pose.worldTransform.getOpenGLMatrix(mat);
+    //glTranslatef(pose.worldTransform.getOrigin().x(), pose.worldTransform.getOrigin().y(), pose.worldTransform.getOrigin().z());
     //
     //
 
-    //glRotatef(-45, 1, 0, 0);
+    glTranslatef(pose.worldTransform.getOrigin().x(), pose.worldTransform.getOrigin().y(), pose.worldTransform.getOrigin().z());
+
+    printf("%f,%f,%f\n", pose.worldTransform.getOrigin().x(), pose.worldTransform.getOrigin().y(), pose.worldTransform.getOrigin().z());
     
-    
-    /*
-    btQuaternion quat = pose->worldTransform.getRotation();
+    btQuaternion quat = pose.worldTransform.getRotation();
     btVector3 axis = quat.getAxis();
     glRotatef(quat.getAngle(), axis.x(), axis.y(), axis.z());
-    printf("%f\n", pose->worldTransform.getRotation().angle(btQuaternion(btVector3(0,1,0),0))*57.0);
-    */
+
+    //printf("%f,%f,%f,%f\n", quat.getAngle(), axis.x(), axis.y(), axis.z());
+
+    //printf("%f\n", pose.worldTransform.getRotation().angle(btQuaternion(btVector3(0,1,0),0))*57.0);
 
     glBegin(GL_TRIANGLES);
 

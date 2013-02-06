@@ -180,8 +180,7 @@ void GUI::setupLight() {
 }
 
 void GUI::draw() {
-    //this->simulator->stepSimulation(1./60.);
-
+    this->simulator->stepSimulation(1./60.);
     //glCanvas->resize(700,500);
     glClearColor(0.0, 0.0, 0.0, 1.0);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -207,16 +206,14 @@ void GUI::draw() {
 
     for(auto o : this->entityHandler->staticEnts) {
         Entity* e = o.second;
-        e->getOpenGLObject()->draw(&e->getPose());
+        e->getOpenGLObject()->draw(e->getPose());
     }
     for(auto o : this->entityHandler->dynamicEnts) {
         Entity* e = o.second;
-        e->getOpenGLObject()->draw(&e->getPose());
+        e->getOpenGLObject()->draw(e->getPose());
     }
 
-
     this->glCanvas->endDraw();
-
 
     this->glCanvas->updateGL();
 
