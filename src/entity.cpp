@@ -44,7 +44,7 @@ void Entity::initRigidBody (btScalar mass, btCollisionShape *shape,
 }
 
 Entity::~Entity() {
-    printf("Deleted an entity\n");
+    // printf("Deleted an entity\n");
     delete rigidBody;
     rigidBody = nullptr;
     delete openglObject;

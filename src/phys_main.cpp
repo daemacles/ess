@@ -57,12 +57,10 @@ int main(int argc, char **argv)
 {
     EntityHandler entities;
     Simulator sim(&entities);
-    std::cout << entities.staticEnts["ground"]->getRigidBody() << std::endl;
    
     if (argc == 2 && argv[1][0] == 'v') {
         Rocket *rocket = static_cast<Rocket*>(entities.dynamicEnts.at("rocket"));
         // GyroSensor *gyro = static_cast<GyroSensor*>(entities.sensors["gyro"]);
-        printf ("timestamp x y z phi theta psi\n");
         for (int i = 0; i != 80; ++i) {
             sim.stepSimulation(1./60.);
             auto pose = rocket->getPose();
@@ -77,7 +75,8 @@ int main(int argc, char **argv)
         ccdDemo->setDynamicsWorld(sim.getDynamicsWorld());
         ccdDemo->initPhysics();
         sim.getDynamicsWorld()->setDebugDrawer(&gDebugDrawer);
-    
+        printf ("##,##\n");
+        printf ("timestamp,x,y,z,motor\n");
         glutmain(argc, argv, 640, 480,
                  "Bullet Physics Demo. http://bulletphysics.com", ccdDemo);
         delete ccdDemo;
