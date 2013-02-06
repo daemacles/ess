@@ -6,7 +6,7 @@
 #include <QTimeLine>
 #include <QSvgRenderer>
 
-#define GL_WIDTH 1024
+#define GL_WIDTH 768
 #define GL_HEIGHT 480
 
 /*
