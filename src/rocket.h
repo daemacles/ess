@@ -19,7 +19,7 @@ class Rocket : public Entity {
     // ROT1 and ROT2 spin the same direction
     // ROT1 and ROT4 push the same direction
     enum engineName { MAIN1=0, MAIN2, MAIN3, MAIN4,
-                      ROT1, ROT2, ROT3, ROT4 };
+                      ROT1,    ROT2,  ROT3,  ROT4 };
 
     public:
     Rocket (btVector3 startPos = btVector3(0,1,-1),
