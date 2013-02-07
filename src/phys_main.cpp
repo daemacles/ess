@@ -19,6 +19,8 @@
 #include <cstdio>
 #include <iostream>
 #include <cmath>
+#include <thread>
+#include <chrono>
 #include <btBulletDynamicsCommon.h>
 #include "CcdPhysicsDemo.h"
 #include "GlutStuff.h"
@@ -57,12 +59,16 @@ int main(int argc, char **argv)
 {
     EntityHandler entities;
     Simulator sim(&entities);
-   
+    sim.start();
+    
     if (argc == 2 && argv[1][0] == 'v') {
         Rocket *rocket = static_cast<Rocket*>(entities.dynamicEnts.at("rocket"));
         // GyroSensor *gyro = static_cast<GyroSensor*>(entities.sensors["gyro"]);
         for (int i = 0; i != 80; ++i) {
-            sim.stepSimulation(1./60.);
+            //sim.stepSimulation(1./60.);
+            std::chrono::milliseconds dura(100);
+            std::this_thread::sleep_for(dura);
+            
             auto pose = rocket->getPose();
             printPose(pose);
             // auto &angvel = gyro->getValue();
@@ -71,7 +77,7 @@ int main(int argc, char **argv)
         }
     } else {
     
-        CcdPhysicsDemo* ccdDemo = new CcdPhysicsDemo();
+        CcdPhysicsDemo* ccdDemo = new CcdPhysicsDemo(&entities);
         ccdDemo->setDynamicsWorld(sim.getDynamicsWorld());
         ccdDemo->initPhysics();
         sim.getDynamicsWorld()->setDebugDrawer(&gDebugDrawer);
@@ -82,6 +88,7 @@ int main(int argc, char **argv)
         delete ccdDemo;
     }
 
+    sim.stop();
     printf("Program finished, bye!\n");
     return 0;
 }

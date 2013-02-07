@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <thread>
+#include <chrono>
 
 #include "simulator.h"
 
@@ -9,7 +11,11 @@ void simCallback(btDynamicsWorld *world, btScalar timeStep) {
 }
 
 Simulator::Simulator (EntityHandler *_ents):
-    entities(_ents), elapsedTime(0.0) {
+    entities(_ents),
+    elapsedTime(0.0),
+    running(false),
+    simThread(nullptr)
+{
     
     /// collision configuration contains default setup for memory, collision setup
     collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -58,8 +64,26 @@ Simulator::Simulator (EntityHandler *_ents):
     }
 }
 
+void Simulator::start () {
+    if (!running) {
+        running = true;
+        simThread = new std::thread(&Simulator::mainLoop, this);
+    }
+}
+
+void Simulator::stop() {
+    if (running) {
+        running = false;
+        simThread->join();
+        delete simThread;
+        simThread = nullptr;
+    }
+}
+
 void Simulator::stepSimulation (btScalar delta_t) {
+    entities->lock();
     dynamicsWorld->stepSimulation(delta_t);
+    entities->unlock();
 }
 
 
@@ -86,3 +110,11 @@ Simulator::~Simulator () {
     delete collisionConfiguration;
 }
 
+void Simulator::mainLoop (void) {
+    static float delay = 1.0;
+    while (running) {
+        stepSimulation(1./100);
+        std::chrono::milliseconds dura(10);
+        std::this_thread::sleep_for(dura);
+    }
+}

@@ -21,6 +21,7 @@ void EntityHandler::init () {
     dynamicEnts["rocket"]->getRigidBody()->setAngularVelocity({0,0,0});
 }    
 
+
 void EntityHandler::callUpdates (btScalar delta_t, btScalar time) {
     for (auto pr : dynamicEnts) {
         auto ent = pr.second;

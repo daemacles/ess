@@ -23,7 +23,9 @@
 #define PlatformDemoApplication GlutDemoApplication
 
 #include "LinearMath/btAlignedObjectArray.h"
+
 #include "stlmesh.h"
+#include "entityhandler.h"
 
 class btBroadphaseInterface;
 class btCollisionShape;
@@ -39,10 +41,11 @@ class CcdPhysicsDemo : public PlatformDemoApplication
 {
     private:
     int m_ccdMode;
+    EntityHandler *entities;    
 
     public:
 
-    CcdPhysicsDemo();
+    CcdPhysicsDemo(EntityHandler *_entities);
     virtual ~CcdPhysicsDemo() { exitPhysics(); }
 
     void         initPhysics();
@@ -54,16 +57,6 @@ class CcdPhysicsDemo : public PlatformDemoApplication
     virtual void displayCallback();
     virtual void shootBox(const btVector3& destination);
     virtual void clientResetScene();
-
-    void callback (btScalar timeStep);
-    
-    static DemoApplication* Create()
-    {
-        CcdPhysicsDemo* demo = new CcdPhysicsDemo;
-        demo->myinit();
-        demo->initPhysics();
-        return demo;
-    }
 };
 
 #endif //BT_CCD_PHYSICS_DEMO_H

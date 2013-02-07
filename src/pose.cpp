@@ -8,9 +8,16 @@ Pose::Pose(btRigidBody *b, btScalar time)
 }
 
 void Pose::update(btRigidBody *b, btScalar time) {
+    // The orientation is used to change from the world frame of reference to
+    // our local frame of referene.
     auto ori = b->getOrientation();
+
     worldTransform = b->getCenterOfMassTransform();
     linVel         = b->getLinearVelocity().rotate(ori.getAxis(), ori.getAngle());
+    linForce       = b->getTotalForce().rotate(ori.getAxis(), ori.getAngle());
+
+    // IS THIS IN WORLD COORDS SOMEHOW???
+    torque         = b->getTotalTorque().rotate(ori.getAxis(), ori.getAngle());
 
     // Calculate local angular velocity
     btVector3 angVelWorld = b->getAngularVelocity();
@@ -20,16 +27,8 @@ void Pose::update(btRigidBody *b, btScalar time) {
     angVel = {angVelWorld.dot(xvec),
               angVelWorld.dot(yvec),
               angVelWorld.dot(zvec)};
-    
-    // btScalar x_angle = xvec.angle(angVelWorld);
-    // btScalar y_angle = yvec.angle(angVelWorld);
-    // btScalar z_angle = zvec.angle(angVelWorld);
-    // btScalar w = angVelWorld.length();
-    // if (w == 0.0) angVel = {0,0,0};
-    // else          angVel = w * btVector3(cos(x_angle), cos(y_angle), cos(z_angle));
 
-    linForce       = b->getTotalForce().rotate(ori.getAxis(), ori.getAngle());
-    torque         = b->getTotalTorque().rotate(ori.getAxis(), ori.getAngle());
+    // Keep time
     timestamp      = time;
 }
 

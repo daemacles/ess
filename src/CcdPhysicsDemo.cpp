@@ -32,7 +32,7 @@
 
 static GLDebugDrawer sDebugDrawer;
 
-CcdPhysicsDemo::CcdPhysicsDemo()
+CcdPhysicsDemo::CcdPhysicsDemo(EntityHandler *_entities): entities(_entities)
 {
     setDebugMode(btIDebugDraw::DBG_DrawText + btIDebugDraw::DBG_NoHelpText);
     setCameraDistance(btScalar(20.));
@@ -43,24 +43,18 @@ void CcdPhysicsDemo::clientMoveAndDisplay() {
  
     /// step the simulation
     if (m_dynamicsWorld) {
-        m_dynamicsWorld->stepSimulation(1./60.);
+        //m_dynamicsWorld->stepSimulation(1./60.);
         // optional but useful: debug drawing
-        m_dynamicsWorld->debugDrawWorld();
+        //m_dynamicsWorld->debugDrawWorld();
     }
-  
-    renderme(); 
+
+    entities->lock();
+    renderme();
+    entities->unlock();
+    
     glFlush();
     swapBuffers();
 }
-
-void myCallback(btDynamicsWorld *world, btScalar timeStep) {
-    CcdPhysicsDemo *d = static_cast<CcdPhysicsDemo *>(world->getWorldUserInfo());
-    d->callback(timeStep);
-}
-
-void CcdPhysicsDemo::callback(btScalar timeStep) {
-}
-
 
 void CcdPhysicsDemo::displayText() {
 }
