@@ -34,7 +34,7 @@ class OpenGLObject {
 #else
 class OpenGLObject {
     public:
-    void setColor(btVector3 color) {} ;
+    void setColor(float* color) {} ;
         //void draw(Pose* pose) { }
         //OpenGLObject(std::vector<btVector3*> polygons) { }
 };

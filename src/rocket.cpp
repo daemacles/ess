@@ -36,21 +36,23 @@ void Rocket::update (btScalar timeStep, btScalar time) {
     rigidBody->setActivationState(ACTIVE_TAG);
     // rigidBody->setLinearVelocity({0,0,0}); // ROCKET CAN'T MOVE!!!!
 
-    // No spinning!
+    // No spinning! (a controller)
     btScalar xangErr = pose.angVel.x();
     btScalar yangErr = pose.angVel.y();
     btScalar zangErr = pose.angVel.z();
 
+    // Rotation engines
     btScalar CWSpin = 0.0;
     btScalar CCWSpin = 0.0;
-    if (yangErr > 0.0) CWSpin = 0.1 + yangErr;
+    if (yangErr > 0.0) CWSpin  = 0.1 + yangErr;
     if (yangErr < 0.0) CCWSpin = 0.1 - yangErr;
-    printf ("%f,%f,%f,%f\n",
-            time,
-            pose.angVel.x(),
-            pose.angVel.y(),
-            pose.angVel.z());
-    
+    // printf ("%f,%f,%f,%f\n",
+    //         time,
+    //         pose.angVel.x(),
+    //         pose.angVel.y(),
+    //         pose.angVel.z());
+
+    // Main engines
     btScalar m1 = 0.0;
     btScalar m2 = 0.0;
     btScalar m3 = 0.0;

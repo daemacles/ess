@@ -27,6 +27,8 @@
 #include "GLDebugDrawer.h"
 //#include <QtOpenGL>
 
+#include "entityhandler.h"
+#include "zmqhandler.h"
 #include "simulator.h"
 #include "rocket.h"
 #include "pose.h"
@@ -58,7 +60,8 @@ int main(int argc, char **argv)
 #endif
 {
     EntityHandler entities;
-    Simulator sim(&entities);
+    ZMQHandler networkHandler;
+    Simulator sim(&entities, &networkHandler);
     sim.start();
     
     if (argc == 2 && argv[1][0] == 'v') {

@@ -13,6 +13,7 @@ class GyroSensor : public Sensor {
         Sensor(_name), target(_target) {};
 
     virtual SensorType getSensorType () { return Sensor::GYRO; }
+    virtual std::string getSensorTypeString () { return "GYRO"; }
     virtual const btVector3& getValue () { return data; }
     virtual btScalar getTimestamp () { return timestamp; }
     virtual void update (btScalar ts);

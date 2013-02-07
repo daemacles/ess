@@ -1,21 +1,24 @@
 #include <iostream>
-#include <vector>
-#include <thread>
-#include <chrono>
 
 #include "simulator.h"
+#include "zmqhandler.h"
 
 void simCallback(btDynamicsWorld *world, btScalar timeStep) {
     Simulator *sim = static_cast<Simulator*>(world->getWorldUserInfo());
     sim->callback(timeStep);
 }
 
-Simulator::Simulator (EntityHandler *_ents):
+Simulator::Simulator (EntityHandler *_ents, NetworkHandler *_net):
     entities(_ents),
+    networkHandler(_net),
     elapsedTime(0.0),
     running(false),
     simThread(nullptr)
 {
+    // Create a default network handler if one wasn't passed to us.
+    if (_net == nullptr) {
+        networkHandler = new ZMQHandler();
+    }
     
     /// collision configuration contains default setup for memory, collision setup
     collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -96,6 +99,29 @@ btDynamicsWorld* Simulator::getDynamicsWorld () {
     return dynamicsWorld;
 }
 
+RocketControl Simulator::getControl () {
+    return networkHandler->getControl();
+}
+
+void Simulator::sendSensors () {
+    networkHandler->sendSensors(entities->sensors);
+}
+
+
+void Simulator::mainLoop (void) {
+    // TODO: change duration so it limits to 100 updates a second, but allows
+    // for slower times if the client really has to think about things.
+    while (running) {
+        sendSensors();
+        nextControl = getControl();
+        stepSimulation(1./100);
+
+        // Rate limit the simulation
+        std::chrono::milliseconds dura(10);
+        std::this_thread::sleep_for(dura);
+    }
+}
+
 Simulator::~Simulator () {
     // remove the rigidbodies from the dynamics world
     for (int i = dynamicsWorld->getNumCollisionObjects()-1; i != 0 ; --i) {
@@ -110,11 +136,3 @@ Simulator::~Simulator () {
     delete collisionConfiguration;
 }
 
-void Simulator::mainLoop (void) {
-    static float delay = 1.0;
-    while (running) {
-        stepSimulation(1./100);
-        std::chrono::milliseconds dura(10);
-        std::this_thread::sleep_for(dura);
-    }
-}

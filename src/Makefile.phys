@@ -1,11 +1,18 @@
 OPTIMIZE = -O2
+
 CC = g++-4.7
+
 CFLAGS = $(OPTIMIZE) -std=c++11 -g -Wall -I. -I../src \
-         $(shell pkg-config bullet --cflags) -DPHYS_DEMO -pedantic -Wextra \
+         $(shell pkg-config bullet --cflags) \
+         $(shell pkg-config libzmq --cflags) \
+         -DPHYS_DEMO -pedantic -Wextra \
 	 -Winit-self -Wc++11-compat
 
-CLIBS = -L. -lOpenGLSupport $(shell pkg-config bullet --libs) \
+CLIBS = -L. -lOpenGLSupport \
+        $(shell pkg-config bullet --libs) \
+        $(shell pkg-config libzmq --libs) \
         -lm -lGL -lGLU -lglut 
+
 SRCS =  phys_main.cpp \
 	stlmesh.cpp \
 	simulator.cpp \
@@ -16,26 +23,16 @@ SRCS =  phys_main.cpp \
 	shapehandler.cpp \
 	rocket.cpp \
 	ground.cpp \
+        gyrosensor.cpp \
+        zmqhandler.cpp \
 	CcdPhysicsDemo.cpp
-OBJS =  phys_main.o \
-	stlmesh.o \
-	simulator.o \
-	entityhandler.o \
-	entity.o \
-	pose.o \
-	sensor.o \
-	shapehandler.o \
-	rocket.o \
-	ground.o \
-	CcdPhysicsDemo.o
+OBJS = $(SRCS:.cpp=.o)
 
 MAKEDEPEND = gcc -M $(CFLAGS) -o $*.d $<
 
 EXE = phys_demo
 
-all: $(EXE)
-	$(CC) --version
-	global -u # run incremental update
+all: $(EXE) client
 
 run: $(EXE)
 	./$(EXE)
@@ -53,8 +50,11 @@ include $(SRCS:.cpp=.P)
 $(EXE): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@ $(CLIBS)
 
+client: client.o
+	$(CC) $(CFLAGS) $< -o $@ $(CLIBS)
+
 clean:
 	rm -f *.o
 #	rm -f *.P
-	rm -f $(EXE)
+	rm -f $(EXE) client
 # DO NOT DELETE

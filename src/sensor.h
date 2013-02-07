@@ -32,6 +32,7 @@ class Sensor {
     // Subclassed sensors define this to return the type that their getValue
     // method uses so that they can be static_cast as needed.
     virtual SensorType getSensorType () = 0;
+    virtual std::string getSensorTypeString () = 0;
 
     // Returns the time that this sensor value was taken
     virtual btScalar getTimestamp () = 0;
