@@ -15,7 +15,9 @@ class Rocket : public Entity {
     btVector3 engineForce    [RocketControl::NUM_ENGINES];
     btScalar  engineStrength [RocketControl::NUM_ENGINES];
 
-    // MAIN1..4 point straight down
+    // MAIN1..4 point straight down,
+    // MAIN1 and 2 are opposite each other, along the x-axis
+    // MAIN3 and 4 are opposite each other, along the z-axis
     // ROT1 and ROT2 spin the same direction
     // ROT1 and ROT4 push the same direction
     enum engineName { MAIN1=0, MAIN2, MAIN3, MAIN4,

@@ -76,7 +76,7 @@ int main(int argc, char **argv)
         ccdDemo->initPhysics();
         sim.getDynamicsWorld()->setDebugDrawer(&gDebugDrawer);
         printf ("##,##\n");
-        printf ("timestamp,x,y,z,motor\n");
+        printf ("timestamp,x,y,z\n");
         glutmain(argc, argv, 640, 480,
                  "Bullet Physics Demo. http://bulletphysics.com", ccdDemo);
         delete ccdDemo;

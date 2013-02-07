@@ -36,26 +36,36 @@ void Rocket::update (btScalar timeStep, btScalar time) {
     // rigidBody->setLinearVelocity({0,0,0}); // ROCKET CAN'T MOVE!!!!
 
     // No spinning!
-    btQuaternion ori = rigidBody->getOrientation();
-    btScalar angErr = pose.angVel.y();
+    btScalar xangErr = pose.angVel.x();
+    btScalar yangErr = pose.angVel.y();
+    btScalar zangErr = pose.angVel.z();
+
     btScalar CWSpin = 0.0;
     btScalar CCWSpin = 0.0;
-    // if (angErr > 0.0) CWSpin = 1;
-    // if (angErr < 0.0) CCWSpin = 1;
-    // printf ("%f,%f,%f,%f,%f\n",
-    //         time,
-    //         pose.angVel.x(),
-    //         pose.angVel.y(),
-    //         pose.angVel.z(),
-    //         CCWSpin);
+    if (yangErr > 0.0) CWSpin = 0.1 + yangErr;
+    if (yangErr < 0.0) CCWSpin = 0.1 - yangErr;
+    printf ("%f,%f,%f,%f\n",
+            time,
+            pose.angVel.x(),
+            pose.angVel.y(),
+            pose.angVel.z());
     
+    btScalar m1 = 0.0;
+    btScalar m2 = 0.0;
+    btScalar m3 = 0.0;
+    btScalar m4 = 0.0;
+    if (zangErr < 0.0) m1 = 0.1 - zangErr;
+    if (zangErr > 0.0) m2 = 0.1 + zangErr;
+    if (xangErr > 0.0) m3 = 0.1 + xangErr;
+    if (xangErr < 0.0) m4 = 0.1 - xangErr;
+
     // ROT1 and ROT2 spin the same direction
     // ROT1 and ROT4 push the same direction
     RocketControl c;
-    c.name.main1 = 0.0;
-    c.name.main2 = 0.0;
-    c.name.main3 = 0.0;
-    c.name.main4 = 0.0;
+    c.name.main1 = m1;
+    c.name.main2 = m2;
+    c.name.main3 = m3;
+    c.name.main4 = m4;
     c.name.rot1 = CWSpin;
     c.name.rot2 = CWSpin;
     c.name.rot3 = CCWSpin;
