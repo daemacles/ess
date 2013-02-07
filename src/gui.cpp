@@ -186,7 +186,7 @@ void GUI::setupLight() {
     
 #define LIGHT_STRENGHT 0.3f
     GLfloat ambientLight[] = {LIGHT_STRENGHT, LIGHT_STRENGHT, LIGHT_STRENGHT, 0};
-    GLfloat position[] = { 40.0f, 10.0f, 0.0f, 1.0f };
+    GLfloat position[] = { 20.0f, 10.0f, 20.0f, 1.0f };
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
     glLightfv(GL_LIGHT0, GL_POSITION, position);
