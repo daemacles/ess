@@ -13,6 +13,7 @@ class Entity {
     Pose pose;
     btRigidBody *rigidBody;    // Handle to this entity in bullet
     OpenGLObject *openglObject;
+    double mass;
 
     public:
     Entity (btRigidBody *body=nullptr, 
@@ -26,7 +27,7 @@ class Entity {
     virtual void update (btScalar timeStep, btScalar time);
 
     protected:
-    virtual void initRigidBody (btScalar mass, btCollisionShape *shape,
+    virtual void initRigidBody (btScalar _mass, btCollisionShape *shape,
                                 const btTransform &trans = btTransform::getIdentity());
 };
 

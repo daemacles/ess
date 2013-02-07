@@ -9,6 +9,14 @@
 #include "rocketcontrol.h"
 
 class Rocket : public Entity {
+    public:
+    // This multiplier will give the main engines a combined maximum thrust of 2G
+    static const double MAIN_MULT;
+
+    // This multiplier will give the rotational engines each a thrust of 0.5G,
+    // for 1G combined by two of them.
+    static const double ROT_MULT;
+    
     protected:
     std::vector<Pose> poseHistory;
     btVector3 enginePosition [RocketControl::NUM_ENGINES];

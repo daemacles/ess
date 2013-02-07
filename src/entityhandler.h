@@ -7,6 +7,7 @@
 #include "btBulletDynamicsCommon.h"
 
 #include "entity.h"
+#include "rocket.h"
 #include "sensor.h"
 
 class EntityHandler {
@@ -18,6 +19,7 @@ class EntityHandler {
     entityMap_t dynamicEnts;
     entityMap_t staticEnts;
     std::map<std::string, Sensor*> sensors;
+    Rocket *rocket;
 
     EntityHandler ();
     virtual ~EntityHandler ();

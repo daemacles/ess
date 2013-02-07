@@ -5,12 +5,14 @@ CC = g++-4.7
 CFLAGS = $(OPTIMIZE) -std=c++11 -g -Wall -I. -I../src \
          $(shell pkg-config bullet --cflags) \
          $(shell pkg-config libzmq --cflags) \
+	 $(shell pkg-config jsoncpp --cflags) \
          -DPHYS_DEMO -pedantic -Wextra \
 	 -Winit-self -Wc++11-compat
 
 CLIBS = -L. -lOpenGLSupport \
         $(shell pkg-config bullet --libs) \
         $(shell pkg-config libzmq --libs) \
+	$(shell pkg-config jsoncpp --libs) \
         -lm -lGL -lGLU -lglut 
 
 SRCS =  phys_main.cpp \
@@ -25,6 +27,7 @@ SRCS =  phys_main.cpp \
 	ground.cpp \
         gyrosensor.cpp \
         zmqhandler.cpp \
+        jsonserializer.cpp \
 	CcdPhysicsDemo.cpp
 OBJS = $(SRCS:.cpp=.o)
 
@@ -50,8 +53,8 @@ include $(SRCS:.cpp=.P)
 $(EXE): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@ $(CLIBS)
 
-client: client.o
-	$(CC) $(CFLAGS) $< -o $@ $(CLIBS)
+client: client.o jsonserializer.o gyrosensor.o entity.o pose.o
+	$(CC) $(CFLAGS) $^ -o $@ $(CLIBS)
 
 clean:
 	rm -f *.o

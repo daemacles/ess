@@ -14,11 +14,16 @@ EntityHandler::EntityHandler () {
 // TODO: convert to use a config file instead of hard coding what to load.
 void EntityHandler::init () {
     // Bring life forth into the world!
-    addStatic("ground", new Ground());
     addDynamic("rocket", new Rocket());
-    addSensor("gyro", new GyroSensor("Rocket gyro", dynamicEnts["rocket"]));
+    // Save a handle to our rocket.
+    rocket = static_cast<Rocket *>(dynamicEnts["rocket"]);
 
-    dynamicEnts["rocket"]->getRigidBody()->setAngularVelocity({0,0,0});
+    // STATIC ENTITIES
+    addStatic("ground", new Ground());
+
+    // SENSORS
+    addSensor("gyro", new GyroSensor("Rocket Gyro", rocket));
+
 }    
 
 

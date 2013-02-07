@@ -114,6 +114,7 @@ void Simulator::mainLoop (void) {
     while (running) {
         sendSensors();
         nextControl = getControl();
+        entities->rocket->applyControl(nextControl);
         stepSimulation(1./100);
 
         // Rate limit the simulation

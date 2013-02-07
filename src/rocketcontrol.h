@@ -31,5 +31,7 @@ struct RocketControl {
             float rot4;     // Rotational engine 2
         } name;
     };
+
+    RocketControl (): engine({0,0,0,0,0,0,0,0}) {}
 };
 #endif
