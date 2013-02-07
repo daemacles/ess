@@ -14,6 +14,7 @@ class GUI: public QWidget {
         std::unordered_map<Sensor*, QLabel*> sensorLabelMap;
         QWidget* setupSensors();
         void drawBackground();
+        void drawGroundBackground();
         void setupLight();
 
     public:

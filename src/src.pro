@@ -34,6 +34,7 @@ HEADERS += accelsensor.h \
            networkhandler.h \
            objparser.h \
            openglobject.h \
+           sprite.h \
            physobject.h \
            platform.h \
            pose.h \
@@ -60,6 +61,7 @@ SOURCES += \
            objparser.cpp \
            openglobject.cpp \
            phys_main.cpp \
+           sprite.cpp \
            pose.cpp \
            rocket.cpp \
            sensor.cpp \
