@@ -29,10 +29,11 @@ Pose& Entity::getPose() {
     return pose;
 }
 
-void Entity::initRigidBody (btScalar mass, btCollisionShape *shape,
+void Entity::initRigidBody (btScalar _mass, btCollisionShape *shape,
                             const btTransform &trans) {
     btDefaultMotionState *myMotionState = new btDefaultMotionState(trans);
     btVector3 localInertia(0,0,0);
+    mass = _mass;
     if (mass != 0.0)
         shape->calculateLocalInertia(mass, localInertia);
 
@@ -41,6 +42,10 @@ void Entity::initRigidBody (btScalar mass, btCollisionShape *shape,
     rigidBody = new btRigidBody(cInfo);
     rigidBody->setRestitution(0.0);
     rigidBody->setContactProcessingThreshold(BT_LARGE_FLOAT);
+
+    // Create the initial pose.  This is needed for static entities whose
+    // 'update' method never gets called.
+    pose.update(rigidBody, 0.0);
 }
 
 Entity::~Entity() {

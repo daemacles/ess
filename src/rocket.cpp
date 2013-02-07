@@ -1,6 +1,13 @@
 #include "rocket.h"
 #include <cmath>
 
+// This multiplier will give the main engines a combined maximum thrust of 4G
+const double Rocket::MAIN_MULT = 9.8 * 4.0 / 4.0;
+
+// This multiplier will give the rotational engines each a thrust of 0.5G,
+// for 1G combined by two of them.
+const double Rocket::ROT_MULT = 9.8 * 2.0 / 4.0;
+
 Rocket::Rocket (btVector3 startPos, btScalar mass) {
     ShapeHandler *sh = ShapeHandler::getHandler();
     if (!sh->hasShape("rocket01")) {
@@ -32,38 +39,6 @@ void Rocket::update (btScalar timeStep, btScalar time) {
 
     // Next parent's update, which will update our pose
     Entity::update(timeStep, time);   
-
-    rigidBody->setActivationState(ACTIVE_TAG);
-    // rigidBody->setLinearVelocity({0,0,0}); // ROCKET CAN'T MOVE!!!!
-
-    // No spinning!
-    btQuaternion ori = rigidBody->getOrientation();
-    btScalar angErr = pose.angVel.y();
-    btScalar CWSpin = 0.0;
-    btScalar CCWSpin = 0.0;
-    // if (angErr > 0.0) CWSpin = 1;
-    // if (angErr < 0.0) CCWSpin = 1;
-    // printf ("%f,%f,%f,%f,%f\n",
-    //         time,
-    //         pose.angVel.x(),
-    //         pose.angVel.y(),
-    //         pose.angVel.z(),
-    //         CCWSpin);
-    
-    // ROT1 and ROT2 spin the same direction
-    // ROT1 and ROT4 push the same direction
-    RocketControl c;
-    c.name.main1 = 0.0;
-    c.name.main2 = 0.0;
-    c.name.main3 = 0.0;
-    c.name.main4 = 0.0;
-    c.name.rot1 = CWSpin;
-    c.name.rot2 = CWSpin;
-    c.name.rot3 = CCWSpin;
-    c.name.rot4 = CCWSpin;
-    // = {0.20, 0.20, 0.20, 0.20,
-    //                    CWSpin, , 0.0, 0.0};
-    applyControl(c);
 }
 
 std::vector<Pose>& Rocket::getPoseHistory() {
@@ -95,10 +70,13 @@ void Rocket::fireEngine(int n, btScalar throttle) {
     btVector3 impulse = direction * impulseStrength;
 
     // Last but not least, apply the impulse.
-    rigidBody->applyImpulse(impulse, offset);    
+    rigidBody->applyForce(impulse, offset);    
 }
 
 void Rocket::applyControl (const RocketControl &control) {
+    rigidBody->setActivationState(ACTIVE_TAG);
+    // rigidBody->setLinearVelocity({0,0,0}); // ROCKET CAN'T MOVE!!!!
+
     for (int i = 0; i < RocketControl::NUM_ENGINES; ++i) {
         fireEngine(i, control.engine[i]);
     }
@@ -138,13 +116,15 @@ void Rocket::init (void) {
     engineForce[ROT3]  = btVector3(0, 0, -1).normalize();
     engineForce[ROT4]  = btVector3(0, 0,  1).normalize();
 
-    // STRENGTHS
-    engineStrength[MAIN1] = 1.0;
-    engineStrength[MAIN2] = 1.0;
-    engineStrength[MAIN3] = 1.0;
-    engineStrength[MAIN4] = 1.0;
-    engineStrength[ROT1] = 1.0; // Presumably don't have to fight gravity that much...
-    engineStrength[ROT2] = 1.0;
-    engineStrength[ROT3] = 1.0;
-    engineStrength[ROT4] = 1.0;
+    // STRENGTHS - by default, the main motors can generate 2G of thrust
+    // combined.
+    engineStrength[MAIN1] = mass * MAIN_MULT;
+    engineStrength[MAIN2] = mass * MAIN_MULT;
+    engineStrength[MAIN3] = mass * MAIN_MULT;
+    engineStrength[MAIN4] = mass * MAIN_MULT;
+    engineStrength[ROT1] = mass * ROT_MULT;
+    engineStrength[ROT2] = mass * ROT_MULT;
+    engineStrength[ROT3] = mass * ROT_MULT;
+    engineStrength[ROT4] = mass * ROT_MULT;
 }
+

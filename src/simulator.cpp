@@ -1,15 +1,24 @@
 #include <iostream>
-#include <vector>
 
 #include "simulator.h"
+#include "zmqhandler.h"
 
 void simCallback(btDynamicsWorld *world, btScalar timeStep) {
     Simulator *sim = static_cast<Simulator*>(world->getWorldUserInfo());
     sim->callback(timeStep);
 }
 
-Simulator::Simulator (EntityHandler *_ents):
-    entities(_ents), elapsedTime(0.0) {
+Simulator::Simulator (EntityHandler *_ents, NetworkHandler *_net):
+    entities(_ents),
+    networkHandler(_net),
+    elapsedTime(0.0),
+    running(false),
+    simThread(nullptr)
+{
+    // Create a default network handler if one wasn't passed to us.
+    if (_net == nullptr) {
+        networkHandler = new ZMQHandler();
+    }
     
     /// collision configuration contains default setup for memory, collision setup
     collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -58,8 +67,26 @@ Simulator::Simulator (EntityHandler *_ents):
     }
 }
 
+void Simulator::start () {
+    if (!running) {
+        running = true;
+        simThread = new std::thread(&Simulator::mainLoop, this);
+    }
+}
+
+void Simulator::stop() {
+    if (running) {
+        running = false;
+        simThread->join();
+        delete simThread;
+        simThread = nullptr;
+    }
+}
+
 void Simulator::stepSimulation (btScalar delta_t) {
+    entities->lock();
     dynamicsWorld->stepSimulation(delta_t);
+    entities->unlock();
 }
 
 
@@ -70,6 +97,30 @@ void Simulator::callback (btScalar delta_t) {
 
 btDynamicsWorld* Simulator::getDynamicsWorld () {
     return dynamicsWorld;
+}
+
+RocketControl Simulator::getControl () {
+    return networkHandler->getControl();
+}
+
+void Simulator::sendSensors () {
+    networkHandler->sendSensors(entities->sensors);
+}
+
+
+void Simulator::mainLoop (void) {
+    // TODO: change duration so it limits to 100 updates a second, but allows
+    // for slower times if the client really has to think about things.
+    while (running) {
+        sendSensors();
+        nextControl = getControl();
+        entities->rocket->applyControl(nextControl);
+        stepSimulation(1./100);
+
+        // Rate limit the simulation
+        std::chrono::milliseconds dura(10);
+        std::this_thread::sleep_for(dura);
+    }
 }
 
 Simulator::~Simulator () {

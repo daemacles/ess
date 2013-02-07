@@ -27,14 +27,15 @@ class Sensor {
     public:
     Sensor (std::string _name): name(_name) {}
     
-    std::string getName () { return name; }
+    std::string getName () const { return name; }
 
     // Subclassed sensors define this to return the type that their getValue
     // method uses so that they can be static_cast as needed.
-    virtual SensorType getSensorType () = 0;
+    virtual SensorType getSensorType () const = 0;
+    virtual std::string getSensorTypeString () const = 0;
 
     // Returns the time that this sensor value was taken
-    virtual btScalar getTimestamp () = 0;
+    virtual btScalar getTimestamp () const = 0;
 
     // Updates the sensor after a step in the dynamics world
     virtual void update (btScalar ts) = 0;
