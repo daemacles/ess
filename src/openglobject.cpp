@@ -48,10 +48,9 @@ void OpenGLObject::draw(Pose& pose) {
     //
 
     glTranslatef(pose.worldTransform.getOrigin().x(), pose.worldTransform.getOrigin().y(), pose.worldTransform.getOrigin().z());
-    glTranslatef(0, -10, 0);
+    //glTranslatef(0, -10, 0);
     /*
     */
-    //glRotatef(90, 0, 0, 0);
 
     btQuaternion quat = pose.worldTransform.getRotation();
     btVector3 axis = quat.getAxis();
