@@ -14,6 +14,7 @@
 #include "glcanvas.h"
 #include "openglobject.h"
 #include "keyboardinput.h"
+#include "sprite.h"
 
 #define checkImageWidth 1024
 #define checkImageHeight 640
@@ -23,23 +24,8 @@ float ff = 0.0;
 static GLubyte checkImage[checkImageHeight][checkImageWidth][4];
 static GLuint texName;
 
-void makeCheckImage(void)
-{
-    FILE* bmp = fopen("stars.bmp", "r");
-    char buf[4];
-    fseek(bmp, 14, SEEK_SET);
+Sprite* sprite;
 
-   for (int i = 0; i < checkImageHeight; i++) {
-      for (int j = 0; j < checkImageWidth; j++) {
-            fread(buf, 1, 3, bmp);
-         checkImage[i][j][0] = (GLubyte) buf[0];
-         checkImage[i][j][1] = (GLubyte) buf[1];
-         checkImage[i][j][2] = (GLubyte) buf[2];
-         checkImage[i][j][3] = (GLubyte) 255;
-      }
-   }
-    fclose(bmp);
-}
 
 void draw_entity_openglob(Entity* e) {
     Pose pose = e->getPose();
@@ -49,7 +35,7 @@ void draw_entity_openglob(Entity* e) {
 GUI::GUI(EntityHandler* entityhandler, Simulator* sim) {
     this->entityHandler = new EntityHandler();
     this->simulator = new Simulator(this->entityHandler);
-    makeCheckImage();
+    sprite = Sprite::loadFromFile("stars.bmp");
 
 }
 
@@ -96,7 +82,7 @@ void GUI::setup() {
 
     // GL screen widget
     this->glCanvas = new GLCanvas(window);
-    this->glCanvas->setMinimumSize(1024,480);
+    this->glCanvas->setMinimumSize(GL_WIDTH,GL_HEIGHT);
     this->glCanvas->beginDraw();
 
     // Set up timer to update GL screen
@@ -132,7 +118,6 @@ void GUI::drawBackground() {
     glPushMatrix();
     glLoadIdentity();
 
-   makeCheckImage();
    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
    glGenTextures(1, &texName);
@@ -144,14 +129,14 @@ void GUI::drawBackground() {
                    GL_NEAREST);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
                    GL_NEAREST);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth, 
-                checkImageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
-                checkImage);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, sprite->width, 
+                sprite->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
+                sprite->data);
    glEnable(GL_TEXTURE_2D);
    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
    glBindTexture(GL_TEXTURE_2D, texName);
    glBegin(GL_QUADS);
-#define ZOOM_1 20.0
+#define ZOOM_1 30.0
    glTexCoord2f(0.0, 0.0); glVertex3f(-ZOOM_1, -ZOOM_1, -99);
    glTexCoord2f(0.0, 1.0); glVertex3f(-ZOOM_1, ZOOM_1, -99);
    glTexCoord2f(1.0, 1.0); glVertex3f(ZOOM_1, ZOOM_1, -99);
@@ -165,17 +150,15 @@ void GUI::drawBackground() {
 }
 
 void GUI::setupLight() {
+    glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION ) ;
+
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
 
-    GLfloat ambientLight[] = { 0.2f, 1, 0.2f, 1.0f };
-    GLfloat diffuseLight[] = { 0.8f, 1, 0.8, 1.0f };
-    GLfloat specularLight[] = { 0.5f, 1, 0.5f, 1.0f };
-    GLfloat position[] = { -1.5f, 1.0f, -4.0f, 1.0f };
+    GLfloat ambientLight[] = { 0.2f, 0.4, 0.4f, 1.0f };
+    GLfloat position[] = { 0.5f, 0.5f, -0.5f, 0.5f };
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
     glLightfv(GL_LIGHT0, GL_POSITION, position);
 }
 
@@ -193,8 +176,6 @@ void GUI::draw() {
     //OpenGLObject* globj = new OpenGLObject(NULL);
     //
     /*
-    glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION ) ;
-   glEnable ( GL_COLOR_MATERIAL ) ;
     glEnable(GL_LIGHT1);
     */
 
@@ -208,6 +189,7 @@ void GUI::draw() {
         Entity* e = o.second;
         e->getOpenGLObject()->draw(e->getPose());
     }
+    glDisable(GL_LIGHTING);
     for(auto o : this->entityHandler->dynamicEnts) {
         Entity* e = o.second;
         e->getOpenGLObject()->draw(e->getPose());
