@@ -32,6 +32,4 @@ struct RocketControl {
         } name;
     };
 };
-
 #endif
-

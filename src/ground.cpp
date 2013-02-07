@@ -14,7 +14,7 @@ Ground::Ground(btScalar width, btScalar length) {
     ShapeHandler *sh = ShapeHandler::getHandler();
     if (!sh->hasShape("mars")) {
         // Load in the shapes to be used
-        sh->addMesh("mars", "../models/mars_small.stl", false);
+        sh->addMesh("mars", "../models/mars_cut.stl", false);
     }
     
     btCollisionShape *groundShape = sh->getShape("mars");
@@ -25,6 +25,7 @@ Ground::Ground(btScalar width, btScalar length) {
     btTransform trans;
     trans.setIdentity();
     trans.setOrigin(btVector3(0,0,0));
+    trans.setRotation(btQuaternion(btVector3(1, 0, 0), 0));
   
     initRigidBody(0.0f, groundShape, trans);
 }

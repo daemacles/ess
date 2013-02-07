@@ -22,7 +22,7 @@ class Rocket : public Entity {
                       ROT1,    ROT2,  ROT3,  ROT4 };
 
     public:
-    Rocket (btVector3 startPos = btVector3(0,0,0),
+    Rocket (btVector3 startPos = btVector3(0,1,-1),
             btScalar mass = 5.0);
 
     void update (btScalar timeStep, btScalar time);

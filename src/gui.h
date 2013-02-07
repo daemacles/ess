@@ -13,6 +13,8 @@ class GUI: public QWidget {
         GLCanvas* glCanvas;
         std::unordered_map<Sensor*, QLabel*> sensorLabelMap;
         QWidget* setupSensors();
+        void drawBackground();
+        void setupLight();
 
     public:
         GUI(EntityHandler* entityhandler, Simulator* sim);

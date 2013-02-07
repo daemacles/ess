@@ -45,6 +45,7 @@ HEADERS += accelsensor.h \
            shapehandler.h \
            simulator.h \
            stb_image.h \
+           keyboardinput.h \
            stlmesh.h \
            util.h \
            Win32DemoApplication.h
@@ -55,6 +56,7 @@ SOURCES += \
            ground.cpp \
            gui.cpp \
            main.cpp \
+           keyboardinput.cpp \
            objparser.cpp \
            openglobject.cpp \
            phys_main.cpp \
@@ -64,6 +66,7 @@ SOURCES += \
            shapehandler.cpp \
            simulator.cpp \
            stlmesh.cpp \
+           gyrosensor.cpp \
            CcdPhysicsDemo.cpp
 
 INCLUDEPATH += $$PWD/

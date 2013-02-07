@@ -27,9 +27,9 @@ GLCanvas::~GLCanvas()
 }
 
 void GLCanvas::beginDraw() {
-#define ZOOM_1 10.0
+#define ZOOM_1 50.0
     glMatrixMode(GL_PROJECTION);
-    glOrtho(-ZOOM_1, ZOOM_1, -ZOOM_1, ZOOM_1, 0.0, 10);
+    glOrtho(-ZOOM_1, ZOOM_1, -ZOOM_1, ZOOM_1, -100.0, 1000);
 
     glMatrixMode(GL_MODELVIEW);
 
@@ -39,16 +39,4 @@ void GLCanvas::beginDraw() {
 
 void GLCanvas::endDraw() {
     glFlush();
-}
-
-void GLCanvas::draw()
-{
-    glBegin(GL_TRIANGLES);
-    glVertex3f(1.0f, 1.0f, 0.0f);
-    glVertex3f(1, -1, 0.0f);
-    glVertex3f(-1.0f, -1, 0.0f);
-    glEnd();
-
-
-    return;
 }

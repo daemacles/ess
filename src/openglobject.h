@@ -6,6 +6,9 @@
 
 #include "pose.h"
 
+
+#include    <stdio.h>                         // Header File For Standard Input/Output ( NEW )
+
 #ifndef PHYS_DEMO
 #include <QtOpenGL>
 
@@ -15,19 +18,21 @@ struct polygon {
 
 class OpenGLObject {
     private:
-        float ff;
-    
+        btVector3 color;
+
     public:
-    std::vector<btVector3*> polygons;
-    void draw(Pose* pose);
-    OpenGLObject(std::vector<btVector3*> polygons);
+        void setColor(btVector3 color);
+        std::vector<btVector3*> polygons;
+        void draw(Pose& pose);
+        OpenGLObject(std::vector<btVector3*> polygons);
+
 };
 
 #else
 class OpenGLObject {
     public:
-    //void draw(Pose* pose) { }
-    //OpenGLObject(std::vector<btVector3*> polygons) { }
+        //void draw(Pose* pose) { }
+        //OpenGLObject(std::vector<btVector3*> polygons) { }
 };
 #endif
 
