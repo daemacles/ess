@@ -22,20 +22,20 @@ bool KeyboardInput::eventFilter(QObject *obj, QEvent *event)
                     rocket->applyControl(control);
                     return false;
                 }
-                    /*
-                for(auto o : this->entityHandler->dynamicEnts) {
-
-                    Entity* e = o.second;
-                    Pose& p = e->getPose();
-
-                    btVector3 vec = btVector3(
-                            p.worldTransform.getOrigin().x() - 0.01,
-                            p.worldTransform.getOrigin().y() - 0.01,
-                            p.worldTransform.getOrigin().z());
-                    p.worldTransform.setOrigin(vec);
-
+            case Qt::Key_Right:
+                {
+                    Rocket* rocket = static_cast<Rocket*>(entityHandler->dynamicEnts["rocket"]);
+                    RocketControl control = {0.205, 0, 0.205, 0, 0, 0, 0, 0};
+                    rocket->applyControl(control);
+                    return false;
                 }
-                    */
+            case Qt::Key_Left:
+                {
+                    Rocket* rocket = static_cast<Rocket*>(entityHandler->dynamicEnts["rocket"]);
+                    RocketControl control = {0, 0.205, 0, 0.205, 0, 0, 0, 0};
+                    rocket->applyControl(control);
+                    return false;
+                }
             default:
                 break;
         }
