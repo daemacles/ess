@@ -85,3 +85,4 @@ Simulator::~Simulator () {
     delete dispatcher;
     delete collisionConfiguration;
 }
+
