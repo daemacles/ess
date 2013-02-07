@@ -18,7 +18,7 @@ Rocket::Rocket (btVector3 startPos, btScalar mass) {
     btTransform trans;
     trans.setIdentity();
     trans.setOrigin(startPos);
-    trans.setRotation(btQuaternion(btVector3(0, 1, 0), 90/57));
+    trans.setRotation(btQuaternion(btVector3(0, 1, 0), 90.0/57.0));
   
     initRigidBody(mass, rocketShape, trans);
 
