@@ -11,6 +11,7 @@
 
 #ifndef PHYS_DEMO
 #include <QtOpenGL>
+#include "sprite.h"
 
 struct polygon {
     float x, y, z;
@@ -18,10 +19,12 @@ struct polygon {
 
 class OpenGLObject {
     private:
-        btVector3 color;
+        float color[4];
+        Sprite* sprite;
 
     public:
-        void setColor(btVector3 color);
+        void setSprite(Sprite* sprite);
+        void setColor(float* color);
         std::vector<btVector3*> polygons;
         void draw(Pose& pose);
         OpenGLObject(std::vector<btVector3*> polygons);

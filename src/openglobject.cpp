@@ -7,48 +7,28 @@
 #ifndef PHYS_DEMO
 #include <QtOpenGL>
 
-void OpenGLObject::setColor(btVector3 color) {
-    this->color = color;
+void OpenGLObject::setColor(float* color) {
+    this->color[0] = color[0];
+    this->color[1] = color[1];
+    this->color[2] = color[2];
+    this->color[3] = color[3];
+}
+
+void OpenGLObject::setSprite(Sprite* sprite) {
+    this->sprite = sprite;
 }
 
 OpenGLObject::OpenGLObject(std::vector<btVector3*> polygons) {
-    this->color = btVector3(1,0,1);
+    this->color[0] = 0.5;
+    this->color[1] = 0.5;
+    this->color[2] = 0.5;
+    this->color[3] = 1;
     printf("OpenGLObject created with %d polygons\n", polygons.size());
     this->polygons = std::vector<btVector3*>(polygons.size());
     for(int i = 0; i < this->polygons.size(); i++) {
         this->polygons[i] = polygons[i];
-        //printf("%d, %p\n", &polygons[i]);
-        //glVertex3f(this->polygons[i].x(), this->polygons[i].y(), this->polygons[i].z());
     }
-    //this->textureData = rgb_tga("moon.tga", &this->texW, &this->texH);
-    /*
-    this->polygons.resize(3);
-
-    struct polygon pol1;
-    pol1.x = 1;
-    pol1.y = 1;
-    pol1.z = 0;
-
-    struct polygon pol2;
-    pol2.x = 1;
-    pol2.y = -1;
-    pol2.z = 0;
-
-    struct polygon pol3;
-    pol3.x = -1;
-    pol3.y = -1;
-    pol3.z = 0;
-
-    this->polygons.push_back(pol1);
-    this->polygons.push_back(pol2);
-    this->polygons.push_back(pol3);
-
-    //this->polygons.insert(0, pol1);
-
-    //glVertex3f(1.0f, 1.0f, 0.0f);
-    //glVertex3f(1, -1, 0.0f);
-    //glVertex3f(-1.0f, -1, 0.0f);
-    */
+    this->sprite = nullptr;
 }
 
 
@@ -68,26 +48,24 @@ void OpenGLObject::draw(Pose& pose) {
     //
 
     glTranslatef(pose.worldTransform.getOrigin().x(), pose.worldTransform.getOrigin().y(), pose.worldTransform.getOrigin().z());
-    glTranslatef(0, -8, 0);
+    glTranslatef(0, -10, 0);
     /*
-    glRotatef(-30, 0, 1, 0);
-    glRotatef(30, 1, 0, 0);
     */
+    //glRotatef(90, 0, 0, 0);
 
-    //printf("%f,%f,%f\n", pose.worldTransform.getOrigin().x(), pose.worldTransform.getOrigin().y(), pose.worldTransform.getOrigin().z());
-    
     btQuaternion quat = pose.worldTransform.getRotation();
     btVector3 axis = quat.getAxis();
-    glRotatef(quat.getAngle()*57, axis.x(), axis.y(), axis.z());
 
-    /*
+    // bug:
+    //glRotatef(quat.getAngle()*57.0, axis.x(), axis.y(), axis.z());
+    glRotatef(quat.getAngle()*57.0, axis.x(), axis.y(), 0.0f);
+
     //printf("%f,%f,%f,%f\n", quat.getAngle(), axis.x(), axis.y(), axis.z());
-    */
-
-    //printf("%f\n", pose.worldTransform.getRotation().angle(btQuaternion(btVector3(0,1,0),0))*57.0);
 
     glBegin(GL_TRIANGLES);
 
+     
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, this->color);
     for(auto vec : this->polygons) {
         //glTexCoord2f(sin(vec->x()), sin(vec->y()));
         //glColor3f(this->color.x(), this->color.y(), this->color.z());

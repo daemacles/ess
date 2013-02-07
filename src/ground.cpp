@@ -25,7 +25,7 @@ Ground::Ground(btScalar width, btScalar length) {
     btTransform trans;
     trans.setIdentity();
     trans.setOrigin(btVector3(0,0,0));
-    trans.setRotation(btQuaternion(btVector3(1, 0, 0), 0));
+    //trans.setRotation(btQuaternion(btVector3(1, 0, 0), 0));
   
     initRigidBody(0.0f, groundShape, trans);
 }

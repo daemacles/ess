@@ -11,14 +11,15 @@ Rocket::Rocket (btVector3 startPos, btScalar mass) {
     
     btCollisionShape *rocketShape = sh->getShape("rocket01");
     this->openglObject = sh->getMesh("rocket01")->openglobj;
-    this->openglObject->setColor(btVector3(0,0,1));
+    float color[4] = {1, 0, 0, 1};
+    this->openglObject->setColor(color);
 
     // Set up our beginning transform
     //btQuaternion rot(0,0,0,1);
     btTransform trans;
     trans.setIdentity();
     trans.setOrigin(startPos);
-    trans.setRotation(btQuaternion(btVector3(0, 1, 0), 90.0/57.0));
+    trans.setRotation(btQuaternion(btVector3(0, 1, 0), -90.0/57.0));
   
     initRigidBody(mass, rocketShape, trans);
 
