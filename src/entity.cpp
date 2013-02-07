@@ -42,6 +42,10 @@ void Entity::initRigidBody (btScalar _mass, btCollisionShape *shape,
     rigidBody = new btRigidBody(cInfo);
     rigidBody->setRestitution(0.0);
     rigidBody->setContactProcessingThreshold(BT_LARGE_FLOAT);
+
+    // Create the initial pose.  This is needed for static entities whose
+    // 'update' method never gets called.
+    pose.update(rigidBody, 0.0);
 }
 
 Entity::~Entity() {
