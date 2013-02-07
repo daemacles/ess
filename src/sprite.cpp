@@ -22,6 +22,7 @@ Sprite* Sprite::loadFromFile(char* bmpFile) {
 
     char* image = (char*) malloc(4 * width * width);
 
+    fseek(bmp, 14 + 12 + 5, SEEK_SET);
     char buf[3];
 
     for(int i=0; i < height*width; i++) {
