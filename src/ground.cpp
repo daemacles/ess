@@ -19,6 +19,8 @@ Ground::Ground(btScalar width, btScalar length) {
     
     btCollisionShape *groundShape = sh->getShape("mars");
     this->openglObject = sh->getMesh("mars")->openglobj;
+    float color[4] = {0.5f, 0.35f, 0.05f, 1.0f};
+    this->openglObject->setColor(color);
 
     // Set up our beginning transform
     //btQuaternion rot(0,0,0,1);
