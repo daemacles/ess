@@ -1,3 +1,5 @@
+#ifndef _ROCKETCONTROL_H
+#define _ROCKETCONTROL_H 1
 
 /// Each engine control value should be in the range 0..1 and values outside
 /// this will be clamped.  The rocket class itself defines how much power each
@@ -30,3 +32,4 @@ struct RocketControl {
         } name;
     };
 };
+#endif
