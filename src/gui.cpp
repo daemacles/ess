@@ -18,8 +18,6 @@
 
 #define ZOOM_1 50.0f
 
-static GLuint texName;
-
 GUI::GUI(EntityHandler* enthand, Simulator* sim):
     entityHandler(enthand), simulator(sim)
 {
@@ -39,7 +37,8 @@ void GUI::setup() {
     keyboardInput = new KeyboardInput(this->entityHandler);
 
     bgSprite = Sprite::loadFromFile("stars.bmp");
-    bgGroundSprite = Sprite::loadFromFile("dirt.bmp");
+    //bgGroundSprite = Sprite::loadFromFile("dirt.bmp");
+    initBackgroundImage(bgSprite);
 
     loadRocketFireShape();
 
@@ -79,13 +78,17 @@ void GUI::setup() {
     window->show();
 }
 
-void GUI::drawBackgroundImage(Sprite* sprite, float x1, float y1, float x2, float y2, float depth, float rotation) {
+void GUI::initBackgroundImage(Sprite* sprite) {
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glGenTextures(1, &backgroundTextureId);
+}
+
+void GUI::drawBackgroundImage(float x1, float y1, float x2, float y2, float depth, float rotation) {
+    Sprite* sprite = bgSprite;
+
     glPushMatrix();
     glLoadIdentity();
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glGenTextures(1, &texName);
-    glBindTexture(GL_TEXTURE_2D, texName);
+    glBindTexture(GL_TEXTURE_2D, backgroundTextureId);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -96,15 +99,16 @@ void GUI::drawBackgroundImage(Sprite* sprite, float x1, float y1, float x2, floa
             sprite->data);
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-    glBindTexture(GL_TEXTURE_2D, texName);
+
+    glBindTexture(GL_TEXTURE_2D, backgroundTextureId);
+
     glBegin(GL_QUADS);
-
-    glTexCoord2f(0.75 + rotation, 0.0); glVertex3f(x1, y1, depth);
-    glTexCoord2f(0.75 + rotation, 1.0); glVertex3f(x1, y2, depth);
-    glTexCoord2f(1.0f + rotation, 1.0); glVertex3f(x2, y2, depth);
-    glTexCoord2f(1.0f + rotation, 0.0); glVertex3f(x2, y1, depth);
-
+        glTexCoord2f(0.75 + rotation, 0.0); glVertex3f(x1, y1, depth);
+        glTexCoord2f(0.75 + rotation, 1.0); glVertex3f(x1, y2, depth);
+        glTexCoord2f(1.0f + rotation, 1.0); glVertex3f(x2, y2, depth);
+        glTexCoord2f(1.0f + rotation, 0.0); glVertex3f(x2, y1, depth);
     glEnd();
+
     glFlush();
     glDisable(GL_TEXTURE_2D);
 
@@ -112,11 +116,11 @@ void GUI::drawBackgroundImage(Sprite* sprite, float x1, float y1, float x2, floa
 }
 
 void GUI::drawBackground() {
-    this->drawBackgroundImage(bgSprite, -ZOOM_1, -ZOOM_1+5, ZOOM_1, ZOOM_1+5, -99.0f, planetRotation);
+    this->drawBackgroundImage(-ZOOM_1, -ZOOM_1+5, ZOOM_1, ZOOM_1+5, -99.0f, planetRotation);
 }
 
 void GUI::drawGroundBackground() {
-    this->drawBackgroundImage(bgGroundSprite, -ZOOM_1, -ZOOM_1+5, ZOOM_1, 0, -98.0f, 0);
+    this->drawBackgroundImage(-ZOOM_1, -ZOOM_1+5, ZOOM_1, 0, -98.0f, 0);
 }
 
 void GUI::sunLight() {
@@ -207,7 +211,7 @@ void GUI::draw() {
 
 
     // Draw space image
-    //this->drawBackground();
+    this->drawBackground();
     planetRotation += -0.00003f;
 
     // Draw moon dirt image

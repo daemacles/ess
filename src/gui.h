@@ -22,6 +22,7 @@ class GUI: public QWidget {
 
         unsigned int lastSeenEngineFire;
         float fireCountdown;
+        GLuint backgroundTextureId;
 
         KeyboardInput* keyboardInput;
 
@@ -34,8 +35,9 @@ class GUI: public QWidget {
 
         void loadRocketFireShape();
 
+        void initBackgroundImage(Sprite* sprite);
         void drawBackground();
-        void drawBackgroundImage(Sprite* sprite, float x1, float x2, float y1, float y2, float depth, float rotation);
+        void drawBackgroundImage(float x1, float x2, float y1, float y2, float depth, float rotation);
         void drawGroundBackground();
         void drawPoseHistory();
 
