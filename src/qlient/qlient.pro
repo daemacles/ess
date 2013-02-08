@@ -21,9 +21,9 @@ HEADERS  += qtessclient.h \
 FORMS    += qtessclient.ui
 
 INCLUDEPATH += $$PWD/../src
-DEPENDPATH += . ../esscommon ../libessclient
-INCLUDEPATH += . ../esscommon ../libessclient
+DEPENDPATH += . ../esscommon ../essclient
+INCLUDEPATH += . ../esscommon ../essclient
 CONFIG += link_pkgconfig
 PKGCONFIG += libzmq jsoncpp
-LIBS += -L../libessclient -lessclient -lm
+LIBS += -L../essclient -lessclient -lm
 

@@ -29,18 +29,15 @@ void QtESSClient::keyPressEvent (QKeyEvent *event) {
     char key = event->text().data()[0].toAscii();
     switch(key) {
     case 'w':
-        printf("UP\n");
         rocketControl->name.main3 = 1;
         rocketControl->name.main4 = 1;
         break;
     case 'a':
-        printf("RIGHT\n");
         rocketControl->name.main3 = 0;
         rocketControl->name.main4 = 1;
         break;
 
     case 'd':
-        printf("LEFT\n");
         rocketControl->name.main3 = 1;
         rocketControl->name.main4 = 0;
         break;
