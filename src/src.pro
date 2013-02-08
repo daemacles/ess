@@ -59,6 +59,7 @@ SOURCES += \
            ground.cpp \
            gui.cpp \
            main.cpp \
+           platform.cpp \
            keyboardinput.cpp \
            objparser.cpp \
            openglobject.cpp \
