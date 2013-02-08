@@ -21,6 +21,8 @@ Rocket::Rocket (btVector3 startPos, btScalar mass) {
     float color[4] = {1, 0, 0, 1};
     this->openglObject->setColor(color);
 
+    engineFiredCount = 0;
+
     // Set up our beginning transform
     //btQuaternion rot(0,0,0,1);
     btTransform trans;
@@ -46,6 +48,10 @@ std::vector<Pose>& Rocket::getPoseHistory() {
 }
 
 void Rocket::fireEngine(int n, btScalar throttle) {
+    // Count the number of times the engine has been fired,
+    // in order for the gui to create the engine light
+    engineFiredCount++;
+
     // Clamping -- I guess we don't have afterburner.
     if (throttle > 1.0) throttle = 1.0;
     if (throttle < 0.0) throttle = 0.0;
