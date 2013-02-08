@@ -14,6 +14,7 @@
 #include "glcanvas.h"
 #include "openglobject.h"
 #include "keyboardinput.h"
+#include "pose.h"
 
 #define ZOOM_1 50.0f
 
@@ -26,6 +27,14 @@ GUI::GUI(EntityHandler* entityhandler, Simulator* sim) {
     bgGroundSprite = Sprite::loadFromFile("dirt.bmp");
 
     planetRotation = 0.0f;
+    lastSeenEngineFire = 0;
+}
+
+void GUI::loadRocketFireShape() {
+    ShapeHandler *sh = ShapeHandler::getHandler();
+    if (!sh->hasShape("rocket_fire")) {
+        sh->addConvexHull("rocket_fire", "../models/fire.stl");
+    }
 }
 
 QWidget* GUI::setupSensors() {
@@ -60,6 +69,8 @@ QWidget* GUI::setupSensors() {
 }
 
 void GUI::setup() {
+
+    loadRocketFireShape();
 
     QWidget* window = this;
 
@@ -119,8 +130,8 @@ void GUI::drawBackgroundImage(Sprite* sprite, float x1, float y1, float x2, floa
 
     glTexCoord2f(0.0 + rotation, 0.0); glVertex3f(x1, y1, depth);
     glTexCoord2f(0.0 + rotation, 1.0); glVertex3f(x1, y2, depth);
-    glTexCoord2f(1.0 + rotation, 1.0); glVertex3f(x2, y2, depth);
-    glTexCoord2f(1.0 + rotation, 0.0); glVertex3f(x2, y1, depth);
+    glTexCoord2f(0.5 + rotation, 1.0); glVertex3f(x2, y2, depth);
+    glTexCoord2f(0.5 + rotation, 0.0); glVertex3f(x2, y1, depth);
 
     glEnd();
     glFlush();
@@ -137,17 +148,75 @@ void GUI::drawGroundBackground() {
     this->drawBackgroundImage(bgGroundSprite, -ZOOM_1, -ZOOM_1+5, ZOOM_1, 0, -98.0f, 0);
 }
 
-void GUI::setupLight() {
+void GUI::sunLight() {
+#define SUN_LIGHT_STRENGHT 0.3f
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
 
+    GLfloat ambientLight[] = {
+        SUN_LIGHT_STRENGHT,
+        SUN_LIGHT_STRENGHT,
+        SUN_LIGHT_STRENGHT*0.8f
+    };
+    GLfloat position[] = {
+        ZOOM_1,
+        10.0f,
+        20.0f,
+        1.0f
+    };
 
-#define LIGHT_STRENGHT 0.3f
-    GLfloat ambientLight[] = {LIGHT_STRENGHT, LIGHT_STRENGHT, LIGHT_STRENGHT, 0};
-    GLfloat position[] = { 20.0f, 10.0f, 20.0f, 1.0f };
+    //glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.4f);
+    //glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.01);
+    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.8f);
 
-    glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, ambientLight);
     glLightfv(GL_LIGHT0, GL_POSITION, position);
+}
+
+void GUI::rocketEngineLight() {
+#define ENGINE_LIGHT_STRENGTH 1.0f
+    Rocket* rocket = static_cast<Rocket*>(entityHandler->dynamicEnts["rocket"]);
+    Pose pose = rocket->getPose();
+
+    if(fireCountdown < 0.01f) {
+        if(rocket->engineFiredCount == lastSeenEngineFire) {
+            glDisable(GL_LIGHT1);
+            return;
+        } else {
+            fireCountdown = 1.0f;
+        }
+    }
+    fireCountdown -= 0.08f;
+
+    lastSeenEngineFire = rocket->engineFiredCount;
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT1);
+
+    GLfloat ambientLight[] = {
+        fireCountdown*ENGINE_LIGHT_STRENGTH*1.0f,
+        fireCountdown*ENGINE_LIGHT_STRENGTH*1.0f,
+        fireCountdown*ENGINE_LIGHT_STRENGTH*0.0f,
+    };
+    GLfloat position[] = {
+        pose.worldTransform.getOrigin().x(),
+        pose.worldTransform.getOrigin().y(),
+        pose.worldTransform.getOrigin().z()
+    };
+
+
+    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.0);
+    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.01);
+    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.01);
+
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, ambientLight);
+    glLightfv(GL_LIGHT1, GL_POSITION, position);
+
+    ShapeHandler *sh = ShapeHandler::getHandler();
+    OpenGLObject* rocketFireOpenGLObject = sh->getMesh("rocket_fire")->openglobj;
+    rocketFireOpenGLObject->setSprite(NULL);
+    rocketFireOpenGLObject->draw(rocket->getPose());
+    return;
 }
 
 void GUI::draw() {
@@ -161,16 +230,19 @@ void GUI::draw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glShadeModel(GL_FLAT);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
     // Draw space image
     this->drawBackground();
-    planetRotation += -0.001f;
+    planetRotation += -0.0001f;
 
     // Draw moon dirt image
     //this->drawGroundBackground();
 
-    this->setupLight();
+    sunLight();
+    rocketEngineLight();
 
     for(auto o : this->entityHandler->staticEnts) {
         Entity* e = o.second;

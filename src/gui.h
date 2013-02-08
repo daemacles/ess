@@ -14,6 +14,9 @@ class GUI: public QWidget {
         Sprite* bgGroundSprite; // Dirt image
         float planetRotation;
 
+        unsigned int lastSeenEngineFire;
+        float fireCountdown;
+
         EntityHandler* entityHandler;
         Simulator* simulator;
         GLCanvas* glCanvas;
@@ -21,10 +24,14 @@ class GUI: public QWidget {
         std::unordered_map<Sensor*, QLabel*> sensorLabelMap;
         QWidget* setupSensors();
 
+        void loadRocketFireShape();
+
         void drawBackground();
         void drawBackgroundImage(Sprite* sprite, float x1, float x2, float y1, float y2, float depth, float rotation);
         void drawGroundBackground();
-        void setupLight();
+
+        void sunLight();
+        void rocketEngineLight();
 
     public:
 
