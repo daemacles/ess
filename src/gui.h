@@ -17,6 +17,8 @@ class GUI: public QWidget {
         void drawGroundBackground();
         void setupLight();
 
+        float planetRotation;
+
     public:
         GUI(EntityHandler* entityhandler, Simulator* sim);
         void setup();

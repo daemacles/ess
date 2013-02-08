@@ -40,6 +40,7 @@ GUI::GUI(EntityHandler* entityhandler, Simulator* sim) {
     bgSprite = Sprite::loadFromFile("stars.bmp");
     bgGroundSprite = Sprite::loadFromFile("dirt.bmp");
 
+    planetRotation = 0.0f;
 }
 
 QWidget* GUI::setupSensors() {
@@ -167,10 +168,10 @@ void GUI::drawBackground() {
    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
    glBindTexture(GL_TEXTURE_2D, texName);
    glBegin(GL_QUADS);
-   glTexCoord2f(0.0, 0.0); glVertex3f(-ZOOM_1, -ZOOM_1, -99);
-   glTexCoord2f(0.0, 1.0); glVertex3f(-ZOOM_1, ZOOM_1, -99);
-   glTexCoord2f(1.0, 1.0); glVertex3f(ZOOM_1, ZOOM_1, -99);
-   glTexCoord2f(1.0, 0.0); glVertex3f(ZOOM_1, -ZOOM_1, -99);
+   glTexCoord2f(0.0 + planetRotation, 0.0); glVertex3f(-ZOOM_1, -ZOOM_1+5, -99);
+   glTexCoord2f(0.0 + planetRotation, 1.0); glVertex3f(-ZOOM_1, ZOOM_1+5, -99);
+   glTexCoord2f(1.0 + planetRotation, 1.0); glVertex3f(ZOOM_1, ZOOM_1+5, -99);
+   glTexCoord2f(1.0 + planetRotation, 0.0); glVertex3f(ZOOM_1, -ZOOM_1+5, -99);
 
    glEnd();
    glFlush();
@@ -192,6 +193,7 @@ void GUI::setupLight() {
     glLightfv(GL_LIGHT0, GL_POSITION, position);
 }
 
+float yy = 0.0f;
 void GUI::draw() {
     this->simulator->stepSimulation(1./60.);
     //glCanvas->resize(700,500);
@@ -210,7 +212,18 @@ void GUI::draw() {
     */
 
    this->drawBackground();
-   this->drawGroundBackground();
+   //this->drawGroundBackground();
+
+   /*
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+    #define ZOOM_1 50.0
+    glOrtho(-ZOOM_1, ZOOM_1, -ZOOM_1, ZOOM_1, -100.0, 1000);
+    glRotatef(15, 1, 0, 0);
+    yy += 0.005f;
+    */
+
+   planetRotation += -0.001f;
 
    this->setupLight();
     /*
