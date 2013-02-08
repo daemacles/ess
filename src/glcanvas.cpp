@@ -30,7 +30,7 @@ void GLCanvas::beginDraw() {
 #define ZOOM_1 50.0
     glMatrixMode(GL_PROJECTION);
     glOrtho(-ZOOM_1, ZOOM_1, -ZOOM_1, ZOOM_1, -100.0, 1000);
-    glTranslatef(0, -30, 0);
+    glTranslatef(0, -35, 0);
     glRotatef(15, 1, 0, 0);
 
     glMatrixMode(GL_MODELVIEW);
