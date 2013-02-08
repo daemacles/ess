@@ -6,6 +6,10 @@
 
 #include "pose.h"
 
+struct SensorVec3 {
+    double x, y, z;
+};
+
 class Sensor {
     // -- ATTRIBUTES --
     protected:

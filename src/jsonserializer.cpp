@@ -16,13 +16,13 @@ std::string JSONSerializer::toJSON (Sensor const *in) {
     switch(in->getSensorType()) {
     case Sensor::GYRO: {
         GyroSensor const *gs = static_cast<const GyroSensor*>(in);
-        btVector3 data = gs->getValue();
+        SensorVec3 data = gs->getValue();
         const int BUFSIZE = 120;
         char buf[BUFSIZE];
         snprintf(buf, BUFSIZE,
                  "{\"class\" : \"Sensor\", \"type\":\"%s\", \"name\" : \"%s\", \"data\" : [%f, %f, %f]}",
                  gs->getSensorTypeString().c_str(), gs->getName().c_str(),
-                 data.x(), data.y(), data.z());
+                 data.x, data.y, data.z);
         return std::string(buf);
         break;
     }
@@ -43,7 +43,7 @@ Sensor* JSONSerializer::getSensor (const std::string &in) {
     if (type == "GYRO") {
         btScalar vals[3];
         const Json::Value data = (*rootp)["data"];
-        for (int i = 0; i != data.size(); ++i) {
+        for (uint32_t i = 0; i != data.size(); ++i) {
             vals[i] = data[i].asDouble();
         }
         sensor = new GyroSensor(vals[0], vals[1], vals[2]);
@@ -73,7 +73,7 @@ RocketControl* JSONSerializer::getRocketControl (const std::string &in) {
     }
 
     const Json::Value data = (*rootp)["data"];
-    for (int i = 0; i != data.size(); ++i) {
+    for (uint32_t i = 0; i != data.size(); ++i) {
         rc->engine[i] = data[i].asDouble();
     }
     

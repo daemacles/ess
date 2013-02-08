@@ -5,14 +5,10 @@
 #include "entity.h"
 #include "sensor.h"
 
-struct GyroData {
-    double x, y, z;
-};
-
 class GyroSensor : public Sensor {
     private:
     Entity *target;
-    GyroData data;
+    SensorVec3 data;
     
     public:
     /// \param _name the name of this sensor
@@ -21,11 +17,11 @@ class GyroSensor : public Sensor {
         Sensor(_name), target(_target), data{0,0,0} {}
     
     GyroSensor (btScalar x, btScalar y, btScalar z):
-        Sensor("GyroData"), target(nullptr), data{x,y,z} {}
+        Sensor("SensorVec3"), target(nullptr), data{x,y,z} {}
 
     virtual SensorType getSensorType () const { return Sensor::GYRO; }
     virtual std::string getSensorTypeString () const { return "GYRO"; }
-    virtual const GyroData& getValue () const { return data; }
+    virtual const SensorVec3& getValue () const { return data; }
     virtual double getTimestamp () const { return timestamp; }
     virtual void update (btScalar ts);
 };
