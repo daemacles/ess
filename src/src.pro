@@ -13,20 +13,10 @@ QMAKE_CXXFLAGS += -std=c++11 -g
 
 # Input
 HEADERS += accelsensor.h \
-           DebugCastResult.h \
-           DemoApplication.h \
            distancesensor.h \
            entity.h \
            entityhandler.h \
-           GL_DialogDynamicsWorld.h \
-           GL_DialogWindow.h \
-           GL_ShapeDrawer.h \
-           GL_Simplex1to4.h \
            glcanvas.h \
-           GLDebugDrawer.h \
-           GLDebugFont.h \
-           GlutDemoApplication.h \
-           GlutStuff.h \
            ground.h \
            gui.h \
            jsonserializer.h \
@@ -41,7 +31,6 @@ HEADERS += accelsensor.h \
            platform.h \
            pose.h \
            radar.h \
-           RenderTexture.h \
            rocket.h \
            sensor.h \
            sensormessage.h \
@@ -50,8 +39,7 @@ HEADERS += accelsensor.h \
            stb_image.h \
            keyboardinput.h \
            stlmesh.h \
-           util.h \
-           Win32DemoApplication.h
+           util.h 
 SOURCES += \
            entity.cpp \
            entityhandler.cpp \
@@ -63,7 +51,6 @@ SOURCES += \
            keyboardinput.cpp \
            objparser.cpp \
            openglobject.cpp \
-           phys_main.cpp \
            sprite.cpp \
            pose.cpp \
            rocket.cpp \
@@ -73,8 +60,7 @@ SOURCES += \
            zmqhandler.cpp \
            jsonserializer.cpp \
            stlmesh.cpp \
-           gyrosensor.cpp \
-           CcdPhysicsDemo.cpp
+           gyrosensor.cpp
 
 INCLUDEPATH += $$PWD/
 DEPENDPATH += $$PWD/
@@ -86,4 +72,4 @@ else:unix:!symbian: PRE_TARGETDEPS += $$PWD/libOpenGLSupport.a
 unix: CONFIG += link_pkgconfig
 unix: PKGCONFIG += bullet libzmq jsoncpp
 
-unix|win32: LIBS += -L. -lOpenGLSupport -lGLU -lglut -lm
+unix|win32: LIBS += -L. -lm

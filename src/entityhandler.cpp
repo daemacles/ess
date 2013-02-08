@@ -15,7 +15,7 @@ EntityHandler::EntityHandler () {
 // TODO: convert to use a config file instead of hard coding what to load.
 void EntityHandler::init () {
     // Bring life forth into the world!
-    addDynamic("rocket", new Rocket(btVector3(10,1,-1)));
+    addDynamic("rocket", new Rocket(btVector3(10,1,0)));
     // Save a handle to our rocket.
     rocket = static_cast<Rocket *>(dynamicEnts["rocket"]);
 

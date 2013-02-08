@@ -1,3 +1,6 @@
+#ifndef _GUI_H
+#define _GUI_H
+
 #include <QDesktopWidget>
 #include <unordered_map>
 
@@ -5,8 +8,11 @@
 #include "simulator.h"
 #include "glcanvas.h"
 #include "sprite.h"
+#include "keyboardinput.h"
 
 class GUI: public QWidget {
+    // This class keeps track of all OpenGL and Qt drawing
+    //
     private:
         Q_OBJECT
 
@@ -16,6 +22,8 @@ class GUI: public QWidget {
 
         unsigned int lastSeenEngineFire;
         float fireCountdown;
+
+        KeyboardInput* keyboardInput;
 
         EntityHandler* entityHandler;
         Simulator* simulator;
@@ -29,6 +37,7 @@ class GUI: public QWidget {
         void drawBackground();
         void drawBackgroundImage(Sprite* sprite, float x1, float x2, float y1, float y2, float depth, float rotation);
         void drawGroundBackground();
+        void drawPoseHistory();
 
         void sunLight();
         void rocketEngineLight();
@@ -42,3 +51,5 @@ class GUI: public QWidget {
         public slots:
             void draw();
 };
+
+#endif

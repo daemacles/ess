@@ -23,8 +23,6 @@ static GLuint texName;
 GUI::GUI(EntityHandler* enthand, Simulator* sim):
     entityHandler(enthand), simulator(sim)
 {
-    bgSprite = Sprite::loadFromFile("stars.bmp");
-    bgGroundSprite = Sprite::loadFromFile("dirt.bmp");
 
     planetRotation = 0.0f;
     lastSeenEngineFire = 0;
@@ -37,42 +35,15 @@ void GUI::loadRocketFireShape() {
     }
 }
 
-QWidget* GUI::setupSensors() {
-    QWidget* sensorList = new QWidget;
-    QVBoxLayout* sensorListLayout = new QVBoxLayout;
-    sensorList->setLayout(sensorListLayout);
-    sensorListLayout->addWidget(new QLabel("Sensors"));
-
-    std::map<std::string, Sensor*> sensors = this->entityHandler->sensors;
-
-    for(auto o : sensors) {
-        Sensor* s = o.second;
-
-        QWidget* sensorRow = new QWidget;
-        QHBoxLayout* sensorRowLayout = new QHBoxLayout;
-        sensorRow->setLayout(sensorRowLayout);
-
-        /*
-           std::ostringstream buff;
-           buff << s->getValue();
-           QLabel* sensorValueLabel = new QLabel(buff.str().c_str());
-
-           sensorRowLayout->addWidget(sensorValueLabel);
-           */
-        sensorRowLayout->addWidget(new QLabel(s->getName().c_str()));
-
-        sensorListLayout->addWidget(sensorRow);
-    }
-
-    return sensorList;
-
-}
-
 void GUI::setup() {
+    keyboardInput = new KeyboardInput(this->entityHandler);
+
+    bgSprite = Sprite::loadFromFile("stars.bmp");
+    bgGroundSprite = Sprite::loadFromFile("dirt.bmp");
 
     loadRocketFireShape();
 
-    QWidget *window = this;
+    QWidget* window = this;
 
     // GL screen widget
     this->glCanvas = new GLCanvas(window);
@@ -82,9 +53,9 @@ void GUI::setup() {
     // Set up timer to update GL screen
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(draw()));
-    timer->start(20);
+    timer->start(10);
 
-    QWidget* sensorList = this->setupSensors();
+    //QWidget* sensorList = this->setupSensors();
 
     QPushButton *resetButton = new QPushButton("Reset");
     QPushButton *button3= new QPushButton("Reset");
@@ -98,7 +69,7 @@ void GUI::setup() {
 
     QHBoxLayout* buttonRowLayout = new QHBoxLayout;
 
-    buttonRowLayout->addWidget(sensorList);
+    //buttonRowLayout->addWidget(sensorList);
     buttonRowLayout->addWidget(resetButton);
     buttonRowLayout->addWidget(button3);
     buttonRowLayout->addWidget(button4);
@@ -128,10 +99,10 @@ void GUI::drawBackgroundImage(Sprite* sprite, float x1, float y1, float x2, floa
     glBindTexture(GL_TEXTURE_2D, texName);
     glBegin(GL_QUADS);
 
-    glTexCoord2f(0.0 + rotation, 0.0); glVertex3f(x1, y1, depth);
-    glTexCoord2f(0.0 + rotation, 1.0); glVertex3f(x1, y2, depth);
-    glTexCoord2f(0.5 + rotation, 1.0); glVertex3f(x2, y2, depth);
-    glTexCoord2f(0.5 + rotation, 0.0); glVertex3f(x2, y1, depth);
+    glTexCoord2f(0.75 + rotation, 0.0); glVertex3f(x1, y1, depth);
+    glTexCoord2f(0.75 + rotation, 1.0); glVertex3f(x1, y2, depth);
+    glTexCoord2f(1.0f + rotation, 1.0); glVertex3f(x2, y2, depth);
+    glTexCoord2f(1.0f + rotation, 0.0); glVertex3f(x2, y1, depth);
 
     glEnd();
     glFlush();
@@ -223,6 +194,10 @@ void GUI::draw() {
     // This function draws all objects in the world and updates the OpenGL
     // canvas
 
+    // Update physics
+    //this->simulator->stepSimulation(1./60.);
+    //
+
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glShadeModel(GL_FLAT);
@@ -233,31 +208,84 @@ void GUI::draw() {
 
     // Draw space image
     //this->drawBackground();
-    planetRotation += -0.0001f;
+    planetRotation += -0.00003f;
 
     // Draw moon dirt image
     //this->drawGroundBackground();
+    //
+
+    drawPoseHistory();
 
     sunLight();
     rocketEngineLight();
 
-    entityHandler->lock();
-    for(auto &o : this->entityHandler->staticEnts) {
+    for(auto o : this->entityHandler->staticEnts) {
         Entity* e = o.second;
         e->getOpenGLObject()->draw(e->getPose());
     }
-    for(auto &o : this->entityHandler->dynamicEnts) {
+    for(auto o : this->entityHandler->dynamicEnts) {
         Entity* e = o.second;
         e->getOpenGLObject()->draw(e->getPose());
     }
-    entityHandler->unlock();
 
     this->glCanvas->endDraw();
 
     // Render screen
     this->glCanvas->updateGL();
+
+    // Listen for keyboard
+    /*
+    delete keyboardInput;
+    keyboardInput = new KeyboardInput(this->entityHandler);
+    QCoreApplication::instance()->installEventFilter(keyboardInput);
+    */
 }
 
-GUI::~GUI () {
+void GUI::drawPoseHistory() {
+    Rocket* rocket = static_cast<Rocket*>(entityHandler->dynamicEnts["rocket"]);
+    glBegin(GL_LINE_STRIP);
+        float color[] = {1.0f, 1.0f, 1.0f};
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, color);
+        for(auto pose: rocket->poseHistory) {
+            glVertex3f(
+                    pose.worldTransform.getOrigin().x(),
+                    pose.worldTransform.getOrigin().y(),
+                    pose.worldTransform.getOrigin().z()
+                    );
+        }
+    glEnd();
+}
 
+QWidget* GUI::setupSensors() {
+    QWidget* sensorList = new QWidget;
+    QVBoxLayout* sensorListLayout = new QVBoxLayout;
+    sensorList->setLayout(sensorListLayout);
+    sensorListLayout->addWidget(new QLabel("Sensors"));
+
+    std::map<std::string, Sensor*> sensors = this->entityHandler->sensors;
+
+    for(auto o : sensors) {
+        Sensor* s = o.second;
+
+        QWidget* sensorRow = new QWidget;
+        QHBoxLayout* sensorRowLayout = new QHBoxLayout;
+        sensorRow->setLayout(sensorRowLayout);
+
+        /*
+           std::ostringstream buff;
+           buff << s->getValue();
+           QLabel* sensorValueLabel = new QLabel(buff.str().c_str());
+
+           sensorRowLayout->addWidget(sensorValueLabel);
+           */
+        sensorRowLayout->addWidget(new QLabel(s->getName().c_str()));
+
+        sensorListLayout->addWidget(sensorRow);
+    }
+
+    return sensorList;
+
+}
+
+GUI::~GUI() {
 }
