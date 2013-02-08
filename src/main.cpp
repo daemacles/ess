@@ -1,3 +1,7 @@
+#include <cstdlib>
+#include <chrono>
+#include <thread>
+
 #include <QApplication>
 
 #include "gui.h"
@@ -7,20 +11,21 @@ int phys_main(int, char**);
 
 int main(int argc, char *argv[])
 {
+    if (argc != 2) exit(1);
+    EntityHandler entityHandler;
+    ZMQHandler networkHandler(atoi(argv[1]));
+    Simulator simulator(&entityHandler, &networkHandler);
+    simulator.start();
+
+    // std::chrono::milliseconds dura(1000);
+    // std::this_thread::sleep_for(dura);
+    
     QApplication app(argc, argv);
-
-    EntityHandler* entityHandler = new EntityHandler();
-    ZMQHandler* networkHandler = new ZMQHandler(6767);
-    Simulator* simulator = new Simulator(entityHandler, networkHandler);
-
-    GUI* gui = new GUI(entityHandler, simulator);
+    GUI* gui = new GUI(&entityHandler, &simulator);
     gui->setup();
 
     app.exec();
 
-    delete entityHandler;
-    delete simulator;
-
-    phys_main(argc, argv);
+    simulator.stop();
     return 0;
 }

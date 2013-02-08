@@ -1,69 +1,4 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <map>
-#include <memory>
-#include <zmq.hpp>
-#include <cstdlib>
-#include <json/json.h>
-
-#include "rocketcontrol.h"
-#include "jsonserializer.h"
-#include "sensor.h"
-#include "gyrosensor.h"
-
-typedef std::vector<std::unique_ptr<Sensor> > SensorVec;
-
-SensorVec getSensors(zmq::socket_t &socket) {
-    SensorVec sensors;
-    zmq::message_t sensorMsgs;
-    socket.recv(&sensorMsgs);
-        
-    std::string message((char*)sensorMsgs.data());
-    if (message == "!QUIT") {
-        exit(0);
-    }
-
-    Json::Value root;
-    Json::Reader reader;
-    if (!reader.parse(message, root)) {
-        // report to the user the failure and their locations in the document.
-        std::cout << "Failed to parse message\n"
-                  << reader.getFormattedErrorMessages()
-                  << " : " << message
-                  << std::endl;
-        exit(1);
-    }
-    
-    for (int i = 0; i != root.size(); ++i) {
-        Json::Value &item = root[i];
-        if (item.isString() && item.asString() == "END") {
-            break;
-        }
-
-        Sensor *s = nullptr;
-        
-        std::string type = item.get("type", "unknown").asString();
-        if (type == "GYRO") {
-            btScalar vals[3];
-            const Json::Value data = item["data"];
-            for (int i = 0; i != data.size(); ++i) {
-                vals[i] = data[i].asDouble();
-            }
-            s = new GyroSensor(vals[0], vals[1], vals[2]);
-        }
-        
-        // Sensor *s = JSONSerializer::getSensor(root[i].toStyledString());
-        sensors.emplace_back(s);
-    }
-
-    return sensors;
-}
-
-class SensorCallback {
-    public:
-    virtual void operator() (GyroSensor *gyro) {};
-};
+#include "essclient.h"
 
 class GyroCallback : public SensorCallback {
     private:
@@ -75,35 +10,16 @@ class GyroCallback : public SensorCallback {
         *data = gyro->getValue();
     }
 };
-    
-
-class SensorManager {
-    private:
-    std::map<Sensor::SensorType, SensorCallback*> callbacks;
-    
-    public:
-    void registerCallback (Sensor::SensorType type, SensorCallback *cb) {
-        callbacks.insert({type, cb});
-    }
-    
-    void call (Sensor *sensor) {
-        switch (sensor->getSensorType()) {
-        case Sensor::GYRO: {
-            GyroSensor *gyro = static_cast<GyroSensor*>(sensor);
-            (*callbacks.at(Sensor::GYRO))(gyro);
-            break;
-        }
-        default:
-            break;
-        }
-    }
-};
 
 int main(int argc, char **argv) {
+    if (argc != 2) exit(1);
+    
     zmq::context_t context(1);
     zmq::socket_t socket(context, ZMQ_REP);
 
-    socket.connect("tcp://localhost:51919");
+    char buf[80];
+    snprintf(buf, 80, "tcp://localhost:%s", argv[1]);
+    socket.connect(buf);
 
     btVector3 gyroData;
     GyroCallback gyroCb(&gyroData);
@@ -117,7 +33,8 @@ int main(int argc, char **argv) {
         for (auto &sensorp : sensors) {
             sensorManager.call(sensorp.get());
         }
-        // std::cout << "Received " << message << std::endl;
+
+        //printf("%9.4f %9.4f %9.4f\n", gyroData.x(), gyroData.y(), gyroData.z());
         
         // No spinning! (a controller)
         RocketControl rc = {0,0,0,0,0,0,0,0};

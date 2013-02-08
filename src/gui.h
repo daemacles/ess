@@ -35,7 +35,8 @@ class GUI: public QWidget {
 
     public:
 
-        GUI(EntityHandler* entityhandler, Simulator* sim);
+        GUI(EntityHandler* enthand, Simulator* sim);
+        ~GUI ();
         void setup();
 
         public slots:

@@ -111,6 +111,7 @@ void Simulator::sendSensors () {
 void Simulator::mainLoop (void) {
     // TODO: change duration so it limits to 100 updates a second, but allows
     // for slower times if the client really has to think about things.
+    std::cout << "Mainloop running" << std::endl;
     while (running) {
         sendSensors();
         nextControl = getControl();
@@ -121,6 +122,7 @@ void Simulator::mainLoop (void) {
         std::chrono::milliseconds dura(10);
         std::this_thread::sleep_for(dura);
     }
+    std::cout << "Mainloop not running" << std::endl;
 }
 
 Simulator::~Simulator () {

@@ -20,9 +20,9 @@
 
 static GLuint texName;
 
-GUI::GUI(EntityHandler* entityhandler, Simulator* sim) {
-    this->entityHandler = new EntityHandler();
-    this->simulator = new Simulator(this->entityHandler);
+GUI::GUI(EntityHandler* enthand, Simulator* sim):
+    entityHandler(enthand), simulator(sim)
+{
     bgSprite = Sprite::loadFromFile("stars.bmp");
     bgGroundSprite = Sprite::loadFromFile("dirt.bmp");
 
@@ -72,7 +72,7 @@ void GUI::setup() {
 
     loadRocketFireShape();
 
-    QWidget* window = this;
+    QWidget *window = this;
 
     // GL screen widget
     this->glCanvas = new GLCanvas(window);
@@ -82,7 +82,7 @@ void GUI::setup() {
     // Set up timer to update GL screen
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(draw()));
-    timer->start(1);
+    timer->start(20);
 
     QWidget* sensorList = this->setupSensors();
 
@@ -223,9 +223,6 @@ void GUI::draw() {
     // This function draws all objects in the world and updates the OpenGL
     // canvas
 
-    // Update physics
-    this->simulator->stepSimulation(1./60.);
-
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glShadeModel(GL_FLAT);
@@ -235,7 +232,7 @@ void GUI::draw() {
 
 
     // Draw space image
-    this->drawBackground();
+    //this->drawBackground();
     planetRotation += -0.0001f;
 
     // Draw moon dirt image
@@ -244,21 +241,23 @@ void GUI::draw() {
     sunLight();
     rocketEngineLight();
 
-    for(auto o : this->entityHandler->staticEnts) {
+    entityHandler->lock();
+    for(auto &o : this->entityHandler->staticEnts) {
         Entity* e = o.second;
         e->getOpenGLObject()->draw(e->getPose());
     }
-    for(auto o : this->entityHandler->dynamicEnts) {
+    for(auto &o : this->entityHandler->dynamicEnts) {
         Entity* e = o.second;
         e->getOpenGLObject()->draw(e->getPose());
     }
+    entityHandler->unlock();
 
     this->glCanvas->endDraw();
 
     // Render screen
     this->glCanvas->updateGL();
-
-    // Listen for keyboard
-    QCoreApplication::instance()->installEventFilter(new KeyboardInput(this->entityHandler));
 }
 
+GUI::~GUI () {
+
+}
