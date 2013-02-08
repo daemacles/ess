@@ -98,10 +98,10 @@ void GUI::drawBackgroundImage(Sprite* sprite, float x1, float y1, float x2, floa
     glBindTexture(GL_TEXTURE_2D, texName);
     glBegin(GL_QUADS);
 
-    glTexCoord2f(0.0 + rotation, 0.0); glVertex3f(x1, y1, depth);
-    glTexCoord2f(0.0 + rotation, 1.0); glVertex3f(x1, y2, depth);
-    glTexCoord2f(0.5 + rotation, 1.0); glVertex3f(x2, y2, depth);
-    glTexCoord2f(0.5 + rotation, 0.0); glVertex3f(x2, y1, depth);
+    glTexCoord2f(0.75 + rotation, 0.0); glVertex3f(x1, y1, depth);
+    glTexCoord2f(0.75 + rotation, 1.0); glVertex3f(x1, y2, depth);
+    glTexCoord2f(1.0f + rotation, 1.0); glVertex3f(x2, y2, depth);
+    glTexCoord2f(1.0f + rotation, 0.0); glVertex3f(x2, y1, depth);
 
     glEnd();
     glFlush();
@@ -204,10 +204,13 @@ void GUI::draw() {
 
     // Draw space image
     this->drawBackground();
-    planetRotation += -0.0001f;
+    planetRotation += -0.00003f;
 
     // Draw moon dirt image
     //this->drawGroundBackground();
+    //
+
+    drawPoseHistory();
 
     sunLight();
     rocketEngineLight();
@@ -228,6 +231,21 @@ void GUI::draw() {
 
     // Listen for keyboard
     QCoreApplication::instance()->installEventFilter(new KeyboardInput(this->entityHandler));
+}
+
+void GUI::drawPoseHistory() {
+    Rocket* rocket = static_cast<Rocket*>(entityHandler->dynamicEnts["rocket"]);
+    glBegin(GL_LINE_STRIP);
+        float color[] = {1.0f, 1.0f, 1.0f};
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, color);
+        for(auto pose: rocket->poseHistory) {
+            glVertex3f(
+                    pose.worldTransform.getOrigin().x(),
+                    pose.worldTransform.getOrigin().y(),
+                    pose.worldTransform.getOrigin().z()
+                    );
+        }
+    glEnd();
 }
 
 QWidget* GUI::setupSensors() {

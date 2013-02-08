@@ -4,14 +4,11 @@
 #include <vector>
 #include "LinearMath/btVector3.h"
 
-#include "pose.h"
-
-
-#include    <stdio.h>                         // Header File For Standard Input/Output ( NEW )
-
 #ifndef PHYS_DEMO
+
 #include <QtOpenGL>
 #include "sprite.h"
+#include "pose.h"
 
 struct polygon {
     float x, y, z;
@@ -19,7 +16,7 @@ struct polygon {
 
 class OpenGLObject {
     private:
-        float color[4];
+        float color[3];
         Sprite* sprite;
 
     public:

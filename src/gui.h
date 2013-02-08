@@ -1,3 +1,6 @@
+#ifndef _GUI_H
+#define _GUI_H
+
 #include <QDesktopWidget>
 #include <unordered_map>
 
@@ -31,6 +34,7 @@ class GUI: public QWidget {
         void drawBackground();
         void drawBackgroundImage(Sprite* sprite, float x1, float x2, float y1, float y2, float depth, float rotation);
         void drawGroundBackground();
+        void drawPoseHistory();
 
         void sunLight();
         void rocketEngineLight();
@@ -43,3 +47,5 @@ class GUI: public QWidget {
         public slots:
             void draw();
 };
+
+#endif
