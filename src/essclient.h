@@ -17,7 +17,7 @@
 class SensorCallback {
     public:
     // Define a virtual function for each sensor type
-    virtual void operator() (GyroSensor *gyro) {};
+    virtual void operator() (SensorVec3 *data) {};
 };    
 
 //////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ class SensorCallback {
 ////////////////////////////////////////////////////////////////////// 
 class ESSClient {
     public:
-    typedef std::vector<std::unique_ptr<Sensor> > SensorVec;
+    typedef std::vector<std::unique_ptr<SensorData> > SensorVec;
     
     private:
     zmq::context_t context;
@@ -49,7 +49,7 @@ class ESSClient {
     void sendControl (RocketControl &rc);
 
     private:
-    void call (Sensor *sensor);
+    void call (SensorData *data);
 };
 
 #endif

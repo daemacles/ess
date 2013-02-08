@@ -5,7 +5,6 @@
 
 #include "jsonserializer.h"
 #include "sensor.h"
-#include "gyrosensor.h"
 
 #include "essclient.h"
 
@@ -56,20 +55,23 @@ bool ESSClient::getSensors() {
             break;
         }
 
-        Sensor *s = nullptr;
+        SensorData *sensorData = nullptr;
         
         std::string type = item.get("type", "unknown").asString();
         if (type == "GYRO") {
-            btScalar vals[3];
             const Json::Value data = item["data"];
-            for (uint32_t i = 0; i != data.size(); ++i) {
-                vals[i] = data[i].asDouble();
-            }
-            s = new GyroSensor(vals[0], vals[1], vals[2]);
+            SensorVec3 *s = new SensorVec3();
+            s->type = Sensor::GYRO;
+            s->x = data[0].asDouble();
+            s->y = data[1].asDouble();
+            s->z = data[2].asDouble();
+            s->name = item["name"].asString();
+            s->timestamp = item["timestamp"].asDouble();
+            sensorData = s;
         }
         
         // Sensor *s = JSONSerializer::getSensor(root[i].toStyledString());
-        sensors.emplace_back(s);
+        sensors.emplace_back(sensorData);
     }
 
     // Execute callbacks
@@ -89,11 +91,11 @@ void ESSClient::sendControl (RocketControl &rc) {
     socket.send(controlMsg);
 }
 
-void ESSClient::call (Sensor *sensor) {
-    switch (sensor->getSensorType()) {
+void ESSClient::call (SensorData *data) {
+    switch (data->type) {
     case Sensor::GYRO: {
-        GyroSensor *gyro = static_cast<GyroSensor*>(sensor);
-        (*callbacks.at(Sensor::GYRO))(gyro);
+        SensorVec3 *gyroData = static_cast<SensorVec3*>(data);
+        (*callbacks.at(Sensor::GYRO))(gyroData);
         break;
     }
     default:

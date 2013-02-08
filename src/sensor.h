@@ -2,19 +2,14 @@
 #define _SENSOR_H
 
 #include <string>
-#include "btBulletDynamicsCommon.h"
 
-#include "pose.h"
-
-struct SensorVec3 {
-    double x, y, z;
-};
-
+class SensorData;
+    
 class Sensor {
     // -- ATTRIBUTES --
     protected:
     std::string name;
-    double timestamp;
+    SensorData *data;
     
     public:
     enum SensorType {
@@ -33,16 +28,21 @@ class Sensor {
     
     std::string getName () const { return name; }
 
-    // Subclassed sensors define this to return the type that their getValue
-    // method uses so that they can be static_cast as needed.
-    virtual SensorType getSensorType () const = 0;
-    virtual std::string getSensorTypeString () const = 0;
-
-    // Returns the time that this sensor value was taken
-    virtual double getTimestamp () const = 0;
+    virtual SensorData* getData() { return data; }
 
     // Updates the sensor after a step in the dynamics world
-    virtual void update (btScalar ts) = 0;
+    virtual void update (double ts) = 0;
 };
+
+struct SensorData {
+    std::string name;
+    double timestamp;
+    Sensor::SensorType type;
+};
+
+struct SensorVec3 : SensorData {
+    double x, y, z;
+};
+
 
 #endif

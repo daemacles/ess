@@ -64,7 +64,6 @@ SOURCES += \
            keyboardinput.cpp \
            objparser.cpp \
            openglobject.cpp \
-           phys_main.cpp \
            sprite.cpp \
            pose.cpp \
            rocket.cpp \
@@ -76,7 +75,6 @@ SOURCES += \
            stlmesh.cpp \
            gyrosensor.cpp \
            zmqhandler.h \
-           CcdPhysicsDemo.cpp
 
 INCLUDEPATH += $$PWD/
 DEPENDPATH += $$PWD/
@@ -88,4 +86,4 @@ else:unix:!symbian: PRE_TARGETDEPS += $$PWD/libOpenGLSupport.a
 unix: CONFIG += link_pkgconfig
 unix: PKGCONFIG += bullet libzmq jsoncpp
 
-unix|win32: LIBS += -L. -lOpenGLSupport -lGLU -lglut -lm
+unix|win32: LIBS += -L. -lGLU -lglut -lm

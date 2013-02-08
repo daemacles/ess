@@ -11,8 +11,7 @@
 class JSONSerializer {
     public:
     // SENSOR SERIALIZATION
-    static std::string toJSON (const Sensor *in);
-    static Sensor* getSensor (const std::string &in); // on heap
+    static std::string toJSON (const SensorData *in);
 
     // CONTROL SERIALIZATION
     static std::string toJSON (const RocketControl *in);

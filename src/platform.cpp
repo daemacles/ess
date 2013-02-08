@@ -4,8 +4,7 @@ Platform::Platform(btVector3 startPos) {
     ShapeHandler *sh = ShapeHandler::getHandler();
     if (!sh->hasShape("platform")) {
         // Load in the shapes to be used
-        // sh->addMesh("rocket01", "../models/rocket01.stl", true);
-        sh->addConvexHull("platform", "../models/platform.stl");
+        sh->addMesh("platform", "../models/platform.stl", false);
     }
     
     btCollisionShape *platformShape = sh->getShape("platform");
@@ -20,5 +19,5 @@ Platform::Platform(btVector3 startPos) {
     trans.setOrigin(startPos);
     trans.setRotation(btQuaternion(btVector3(0, 1, 0), -90.0/57.0));
   
-    initRigidBody(1.0f, platformShape, trans);
+    initRigidBody(0.0, platformShape, trans);
 }
