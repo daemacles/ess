@@ -11,7 +11,6 @@ GRTAGS
 *.slo
 *.lo
 *.o
-phys_demo
 
 # Compiled Dynamic libraries
 *.so
