@@ -20,11 +20,10 @@
 
 static GLuint texName;
 
-GUI::GUI(EntityHandler* entityhandler, Simulator* sim) {
-    this->entityHandler = new EntityHandler();
-    this->simulator = new Simulator(this->entityHandler);
-    bgSprite = Sprite::loadFromFile("stars.bmp");
-    bgGroundSprite = Sprite::loadFromFile("dirt.bmp");
+GUI::GUI(EntityHandler* entityHandler, Simulator* sim) {
+    this->entityHandler = entityHandler;
+    this->simulator = sim;
+
 
     planetRotation = 0.0f;
     lastSeenEngineFire = 0;
@@ -37,38 +36,9 @@ void GUI::loadRocketFireShape() {
     }
 }
 
-QWidget* GUI::setupSensors() {
-    QWidget* sensorList = new QWidget;
-    QVBoxLayout* sensorListLayout = new QVBoxLayout;
-    sensorList->setLayout(sensorListLayout);
-    sensorListLayout->addWidget(new QLabel("Sensors"));
-
-    std::map<std::string, Sensor*> sensors = this->entityHandler->sensors;
-
-    for(auto o : sensors) {
-        Sensor* s = o.second;
-
-        QWidget* sensorRow = new QWidget;
-        QHBoxLayout* sensorRowLayout = new QHBoxLayout;
-        sensorRow->setLayout(sensorRowLayout);
-
-        /*
-           std::ostringstream buff;
-           buff << s->getValue();
-           QLabel* sensorValueLabel = new QLabel(buff.str().c_str());
-
-           sensorRowLayout->addWidget(sensorValueLabel);
-           */
-        sensorRowLayout->addWidget(new QLabel(s->getName().c_str()));
-
-        sensorListLayout->addWidget(sensorRow);
-    }
-
-    return sensorList;
-
-}
-
 void GUI::setup() {
+    bgSprite = Sprite::loadFromFile("stars.bmp");
+    bgGroundSprite = Sprite::loadFromFile("dirt.bmp");
 
     loadRocketFireShape();
 
@@ -204,7 +174,6 @@ void GUI::rocketEngineLight() {
         pose.worldTransform.getOrigin().z()
     };
 
-
     glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.0);
     glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.01);
     glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.01);
@@ -216,7 +185,6 @@ void GUI::rocketEngineLight() {
     OpenGLObject* rocketFireOpenGLObject = sh->getMesh("rocket_fire")->openglobj;
     rocketFireOpenGLObject->setSprite(NULL);
     rocketFireOpenGLObject->draw(rocket->getPose());
-    return;
 }
 
 void GUI::draw() {
@@ -262,3 +230,33 @@ void GUI::draw() {
     QCoreApplication::instance()->installEventFilter(new KeyboardInput(this->entityHandler));
 }
 
+QWidget* GUI::setupSensors() {
+    QWidget* sensorList = new QWidget;
+    QVBoxLayout* sensorListLayout = new QVBoxLayout;
+    sensorList->setLayout(sensorListLayout);
+    sensorListLayout->addWidget(new QLabel("Sensors"));
+
+    std::map<std::string, Sensor*> sensors = this->entityHandler->sensors;
+
+    for(auto o : sensors) {
+        Sensor* s = o.second;
+
+        QWidget* sensorRow = new QWidget;
+        QHBoxLayout* sensorRowLayout = new QHBoxLayout;
+        sensorRow->setLayout(sensorRowLayout);
+
+        /*
+           std::ostringstream buff;
+           buff << s->getValue();
+           QLabel* sensorValueLabel = new QLabel(buff.str().c_str());
+
+           sensorRowLayout->addWidget(sensorValueLabel);
+           */
+        sensorRowLayout->addWidget(new QLabel(s->getName().c_str()));
+
+        sensorListLayout->addWidget(sensorRow);
+    }
+
+    return sensorList;
+
+}

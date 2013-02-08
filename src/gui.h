@@ -7,6 +7,8 @@
 #include "sprite.h"
 
 class GUI: public QWidget {
+    // This class keeps track of all OpenGL and Qt drawing
+    //
     private:
         Q_OBJECT
 
