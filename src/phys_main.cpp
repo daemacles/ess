@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 #endif
 {
     EntityHandler entities;
-    ZMQHandler networkHandler;
+    ZMQHandler networkHandler(1200);
     Simulator sim(&entities, &networkHandler);
     sim.start();
     

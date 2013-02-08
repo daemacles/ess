@@ -26,7 +26,7 @@ void ZMQHandler::sendSensors (const std::map<std::string, Sensor*> &sensors) {
     ss << "[";
     for (auto pr : sensors) {
         Sensor *sensor = pr.second;
-        std::string sensorString = JSONSerializer::toJSON(sensor);
+        std::string sensorString = JSONSerializer::toJSON(sensor->getData());
         ss << sensorString << ", ";
     }
     ss << "\"END\"]";

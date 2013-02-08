@@ -15,6 +15,11 @@ CLIBS = -L. -lOpenGLSupport \
 	$(shell pkg-config jsoncpp --libs) \
         -lm -lGL -lGLU -lglut 
 
+CLIENT_CLIBS = -L. -lOpenGLSupport \
+        $(shell pkg-config libzmq --libs) \
+	$(shell pkg-config jsoncpp --libs) \
+        -lm -lGL -lGLU -lglut 
+
 SRCS =  phys_main.cpp \
 	stlmesh.cpp \
 	simulator.cpp \
@@ -28,14 +33,16 @@ SRCS =  phys_main.cpp \
         gyrosensor.cpp \
         zmqhandler.cpp \
         jsonserializer.cpp \
+	platform.cpp \
 	CcdPhysicsDemo.cpp
+
 OBJS = $(SRCS:.cpp=.o)
 
 MAKEDEPEND = gcc -M $(CFLAGS) -o $*.d $<
 
 EXE = phys_demo
 
-all: $(EXE) client
+all: $(EXE) cli_client
 
 run: $(EXE)
 	./$(EXE)
@@ -53,11 +60,14 @@ include $(SRCS:.cpp=.P)
 $(EXE): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@ $(CLIBS)
 
-client: client.o jsonserializer.o gyrosensor.o entity.o pose.o
-	$(CC) $(CFLAGS) $^ -o $@ $(CLIBS)
+libessclient.a: essclient.o jsonserializer.o
+	ar rcs $@ $^
+
+cli_client: cli_client.o libessclient.a
+	$(CC) $(CFLAGS) $^ -o $@ $(CLIENT_CLIBS)
 
 clean:
 	rm -f *.o
-#	rm -f *.P
-	rm -f $(EXE) client
+	rm -f *.P
+	rm -f $(EXE) cli_client
 # DO NOT DELETE

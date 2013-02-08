@@ -1,12 +1,13 @@
 #include <cstdio>
 
 #include "gyrosensor.h"
+#include "entity.h"
 
-void GyroSensor::update (btScalar ts) {
+void GyroSensor::update (double ts) {
     if (target != nullptr) {
-        data = target->getPose().angVel;
-        timestamp = target->getPose().timestamp;
-        // auto &angvel = getValue();
-        // printf ("%9.4f %8.3f %8.3f %8.3f\n", getTimestamp(), angvel.x(), angvel.y(), angvel.z());
+        myData->x = target->getPose().angVel.x();
+        myData->y = target->getPose().angVel.y();
+        myData->z = target->getPose().angVel.z();
+        myData->timestamp = target->getPose().timestamp;
     }
 }

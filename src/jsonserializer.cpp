@@ -4,25 +4,22 @@
 #include <cstdlib>
 #include <string>
 #include <json/json.h>
-#include "btBulletDynamicsCommon.h"
 
 #include "jsonserializer.h"
 #include "sensor.h"
-#include "gyrosensor.h"
 #include "rocketcontrol.h"
 
 // SENSOR SERIALIZATION
-std::string JSONSerializer::toJSON (Sensor const *in) {
-    switch(in->getSensorType()) {
+std::string JSONSerializer::toJSON (const SensorData *in) {
+    switch(in->type) {
     case Sensor::GYRO: {
-        GyroSensor const *gs = static_cast<const GyroSensor*>(in);
-        btVector3 data = gs->getValue();
-        const int BUFSIZE = 120;
+        const SensorVec3 *data = static_cast<const SensorVec3*>(in);
+        const int BUFSIZE = 150;
         char buf[BUFSIZE];
         snprintf(buf, BUFSIZE,
-                 "{\"class\" : \"Sensor\", \"type\":\"%s\", \"name\" : \"%s\", \"data\" : [%f, %f, %f]}",
-                 gs->getSensorTypeString().c_str(), gs->getName().c_str(),
-                 data.x(), data.y(), data.z());
+                 "{\"class\" : \"Sensor\", \"type\":\"%s\", \"name\" : \"%s\", \"data\" : [%f, %f, %f], "
+                 "\"timestamp\" : %f } ",
+                 "GYRO", data->name.c_str(), data->x, data->y, data->z, data->timestamp);
         return std::string(buf);
         break;
     }
@@ -33,23 +30,6 @@ std::string JSONSerializer::toJSON (Sensor const *in) {
         break;
     }
     }
-}
-
-Sensor* JSONSerializer::getSensor (const std::string &in) {
-    valPtr rootp = parse(in);
-    Sensor *sensor = nullptr;
-
-    std::string type = rootp->get("type", "unknown").asString();
-    if (type == "GYRO") {
-        btScalar vals[3];
-        const Json::Value data = (*rootp)["data"];
-        for (int i = 0; i != data.size(); ++i) {
-            vals[i] = data[i].asDouble();
-        }
-        sensor = new GyroSensor(vals[0], vals[1], vals[2]);
-    }
-
-    return sensor;
 }
 
 // CONTROL SERIALIZATION
@@ -73,7 +53,7 @@ RocketControl* JSONSerializer::getRocketControl (const std::string &in) {
     }
 
     const Json::Value data = (*rootp)["data"];
-    for (int i = 0; i != data.size(); ++i) {
+    for (uint32_t i = 0; i != data.size(); ++i) {
         rc->engine[i] = data[i].asDouble();
     }
     

@@ -27,7 +27,6 @@ void EntityHandler::init () {
 
     // SENSORS
     addSensor("gyro", new GyroSensor("Rocket Gyro", rocket));
-
 }    
 
 

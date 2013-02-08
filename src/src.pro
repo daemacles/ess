@@ -60,7 +60,7 @@ SOURCES += \
            zmqhandler.cpp \
            jsonserializer.cpp \
            stlmesh.cpp \
-           gyrosensor.cpp
+           gyrosensor.cpp 
 
 INCLUDEPATH += $$PWD/
 DEPENDPATH += $$PWD/
