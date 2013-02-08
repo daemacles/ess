@@ -87,7 +87,7 @@ JSONSerializer::valPtr JSONSerializer::parse (const std::string &in) {
         // report to the user the failure and their locations in the document.
         std::cout << "Failed to parse message\n"
                   << reader.getFormattedErrorMessages()
-                  << " " << in
+                  << " : " << in
                   << std::endl;
         exit(1);
     }
