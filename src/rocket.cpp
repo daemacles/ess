@@ -30,6 +30,9 @@ Rocket::Rocket (btVector3 startPos, btScalar mass) {
   
     initRigidBody(mass, rocketShape, trans);
 
+    rigidBody->setLinearFactor({1,1,0});
+    rigidBody->setAngularFactor({0,0,1});
+
     init();
 }
     
