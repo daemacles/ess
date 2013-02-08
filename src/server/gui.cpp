@@ -57,8 +57,8 @@ void GUI::setup() {
     //QWidget* sensorList = this->setupSensors();
 
     QPushButton *resetButton = new QPushButton("Reset");
-    QPushButton *button3= new QPushButton("Reset");
-    QPushButton *button4= new QPushButton("Reset");
+    QPushButton *button3= new QPushButton("Fire Main Cannons");
+    QPushButton *button4= new QPushButton("EJECT!!!");
 
     QVBoxLayout* vlayout = new QVBoxLayout;
     QWidget* buttonRow = new QWidget;
@@ -73,6 +73,8 @@ void GUI::setup() {
     buttonRowLayout->addWidget(button3);
     buttonRowLayout->addWidget(button4);
     buttonRow->setLayout(buttonRowLayout);
+
+    connect(resetButton,SIGNAL(pressed()),this,SLOT(resetRocket()));
 
     window->setLayout(vlayout);
     window->show();
@@ -258,6 +260,22 @@ void GUI::drawPoseHistory() {
                     );
         }
     glEnd();
+}
+
+void GUI::resetRocket() {
+    Rocket *rocket = entityHandler->rocket;
+
+
+    btTransform trans;
+    trans.setIdentity();
+    trans.setRotation(btQuaternion(btVector3(0, 1, 0), -90.0/57.0));
+    trans.setOrigin({10,1,0});
+
+    entityHandler->lock();
+    rocket->getRigidBody()->setCenterOfMassTransform(trans);
+    rocket->getRigidBody()->setLinearVelocity({0,0,0});
+    rocket->getRigidBody()->setAngularVelocity({0,0,0});
+    entityHandler->unlock();
 }
 
 QWidget* GUI::setupSensors() {

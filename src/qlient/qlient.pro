@@ -14,9 +14,9 @@ TARGET = qlient
 TEMPLATE = app
 
 SOURCES += main.cpp\
-        qtessclient.cpp
+        qtessclient.cpp \
 
-HEADERS  += qtessclient.h
+HEADERS  += qtessclient.h \
 
 FORMS    += qtessclient.ui
 

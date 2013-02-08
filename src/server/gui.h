@@ -44,6 +44,7 @@ class GUI: public QWidget {
         void sunLight();
         void rocketEngineLight();
 
+
     public:
 
         GUI(EntityHandler* enthand, Simulator* sim);
@@ -51,6 +52,7 @@ class GUI: public QWidget {
         void setup();
 
         public slots:
+            void resetRocket();
             void draw();
 };
 

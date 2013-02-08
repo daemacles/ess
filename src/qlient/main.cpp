@@ -2,6 +2,7 @@
 #include <thread>
 #include <memory>
 #include <string>
+#include <cstdio>
 
 #include "qtessclient.h"
 #include "essclient.h"
@@ -52,8 +53,8 @@ int main(int argc, char *argv[])
 {
     rc.name.main1 = 0;
     rc.name.main2 = 0;
-    rc.name.main3 = .55;
-    rc.name.main4 = .45;
+    rc.name.main3 = 0;
+    rc.name.main4 = 0;
     rc.name.rot1 = 0;
     rc.name.rot2 = 0;
     rc.name.rot3 = 0;
@@ -62,7 +63,7 @@ int main(int argc, char *argv[])
     qtRunning = true;
     std::thread t1(clientThreadFn);
     QApplication a(argc, argv);
-    QtESSClient w(&qtRunning);
+    QtESSClient w(&qtRunning, &rc);
     w.show();
     
     bool success = a.exec();
