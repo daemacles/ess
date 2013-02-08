@@ -18,9 +18,9 @@ class Rocket : public Entity {
     static const double ROT_MULT;
 
     unsigned int engineFiredCount;
+    std::vector<Pose> poseHistory;
     
     protected:
-    std::vector<Pose> poseHistory;
     btVector3 enginePosition [RocketControl::NUM_ENGINES];
     btVector3 engineForce    [RocketControl::NUM_ENGINES];
     btScalar  engineStrength [RocketControl::NUM_ENGINES];
