@@ -2,6 +2,7 @@
 #define _SENSORSERIALIZER_H 1
 
 #include <memory>
+#include <vector>
 #include <json/json.h>
 
 #include "sensor.h"

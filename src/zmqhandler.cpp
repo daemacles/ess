@@ -1,5 +1,7 @@
 #include <cstdio>
 #include <memory>
+#include <sstream>
+#include <string>
 
 #include "zmqhandler.h"
 #include "jsonserializer.h"
@@ -20,14 +22,18 @@ ZMQHandler::ZMQHandler (int socketNum):
 }
 
 void ZMQHandler::sendSensors (const std::map<std::string, Sensor*> &sensors) {
+    std::stringstream ss;
+    ss << "[";
     for (auto pr : sensors) {
         Sensor *sensor = pr.second;
         std::string sensorString = JSONSerializer::toJSON(sensor);
-        
-        zmq::message_t sensorMsg(sensorString.length());
-        memcpy((void*)sensorMsg.data(), sensorString.c_str(), sensorString.length());
-        socket.send(sensorMsg);
+        ss << sensorString << ", ";
     }
+    ss << "\"END\"]";
+    std::string msgString = ss.str();
+    zmq::message_t sensorMsg(msgString.length());
+    memcpy((void*)sensorMsg.data(), msgString.c_str(), msgString.length());
+    socket.send(sensorMsg);
 }
 
 RocketControl ZMQHandler::getControl (void) {
@@ -46,3 +52,4 @@ ZMQHandler::~ZMQHandler () {
     memcpy ((void*)quitMsg.data(), "!QUIT", 5);
     socket.send(quitMsg);
 }
+
