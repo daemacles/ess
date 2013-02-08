@@ -29,6 +29,8 @@ HEADERS += accelsensor.h \
            GlutStuff.h \
            ground.h \
            gui.h \
+           jsonserializer.h \
+           zmqhandler.h \
            gyrosensor.h \
            main.h \
            networkhandler.h \
@@ -57,6 +59,7 @@ SOURCES += \
            ground.cpp \
            gui.cpp \
            main.cpp \
+           platform.cpp \
            keyboardinput.cpp \
            objparser.cpp \
            openglobject.cpp \
@@ -67,6 +70,8 @@ SOURCES += \
            sensor.cpp \
            shapehandler.cpp \
            simulator.cpp \
+           zmqhandler.cpp \
+           jsonserializer.cpp \
            stlmesh.cpp \
            gyrosensor.cpp \
            CcdPhysicsDemo.cpp
@@ -79,6 +84,6 @@ else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/debug/OpenGLSup
 else:unix:!symbian: PRE_TARGETDEPS += $$PWD/libOpenGLSupport.a
 
 unix: CONFIG += link_pkgconfig
-unix: PKGCONFIG += bullet
+unix: PKGCONFIG += bullet libzmq jsoncpp
 
 unix|win32: LIBS += -L. -lOpenGLSupport -lGLU -lglut -lm

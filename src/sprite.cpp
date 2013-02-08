@@ -9,7 +9,7 @@ Sprite::Sprite(char* _data, int _width, int _height):
 { }
 
 Sprite* Sprite::loadFromFile(std::string bmpFile) {
-    FILE* bmp = fopen(bmpFile.cstr(), "r");
+    FILE* bmp = fopen(bmpFile.c_str(), "r");
 
     fseek(bmp, 18, SEEK_SET);
 
@@ -20,6 +20,7 @@ Sprite* Sprite::loadFromFile(std::string bmpFile) {
 
     char* image = new char[4*width*width];
 
+    fseek(bmp, 14 + 12 + 5, SEEK_SET);
     char buf[3];
 
     for(int i=0; i < height*width; i++) {

@@ -1,6 +1,7 @@
 #include <QApplication>
 
 #include "gui.h"
+#include "zmqhandler.h"
 
 int phys_main(int, char**);
 
@@ -9,7 +10,8 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     EntityHandler* entityHandler = new EntityHandler();
-    Simulator* simulator = new Simulator(entityHandler);
+    ZMQHandler* networkHandler = new ZMQHandler(6767);
+    Simulator* simulator = new Simulator(entityHandler, networkHandler);
 
     GUI* gui = new GUI(entityHandler, simulator);
     gui->setup();

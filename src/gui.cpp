@@ -14,25 +14,11 @@
 #include "glcanvas.h"
 #include "openglobject.h"
 #include "keyboardinput.h"
-#include "sprite.h"
+#include "pose.h"
 
-#define checkImageWidth 1024
-#define checkImageHeight 640
+#define ZOOM_1 50.0f
 
-#define ZOOM_1 50.0
-float ff = 0.0;
-
-static GLubyte checkImage[checkImageHeight][checkImageWidth][4];
 static GLuint texName;
-
-Sprite* bgSprite;
-Sprite* bgGroundSprite;
-
-
-void draw_entity_openglob(Entity* e) {
-    Pose pose = e->getPose();
-    ff += 0.05;
-}
 
 GUI::GUI(EntityHandler* entityhandler, Simulator* sim) {
     this->entityHandler = new EntityHandler();
@@ -40,6 +26,15 @@ GUI::GUI(EntityHandler* entityhandler, Simulator* sim) {
     bgSprite = Sprite::loadFromFile("stars.bmp");
     bgGroundSprite = Sprite::loadFromFile("dirt.bmp");
 
+    planetRotation = 0.0f;
+    lastSeenEngineFire = 0;
+}
+
+void GUI::loadRocketFireShape() {
+    ShapeHandler *sh = ShapeHandler::getHandler();
+    if (!sh->hasShape("rocket_fire")) {
+        sh->addConvexHull("rocket_fire", "../models/fire.stl");
+    }
 }
 
 QWidget* GUI::setupSensors() {
@@ -58,12 +53,12 @@ QWidget* GUI::setupSensors() {
         sensorRow->setLayout(sensorRowLayout);
 
         /*
-        std::ostringstream buff;
-        buff << s->getValue();
-        QLabel* sensorValueLabel = new QLabel(buff.str().c_str());
+           std::ostringstream buff;
+           buff << s->getValue();
+           QLabel* sensorValueLabel = new QLabel(buff.str().c_str());
 
-        sensorRowLayout->addWidget(sensorValueLabel);
-        */
+           sensorRowLayout->addWidget(sensorValueLabel);
+           */
         sensorRowLayout->addWidget(new QLabel(s->getName().c_str()));
 
         sensorListLayout->addWidget(sensorRow);
@@ -74,6 +69,8 @@ QWidget* GUI::setupSensors() {
 }
 
 void GUI::setup() {
+
+    loadRocketFireShape();
 
     QWidget* window = this;
 
@@ -111,110 +108,141 @@ void GUI::setup() {
     window->show();
 }
 
-void GUI::drawGroundBackground() {
+void GUI::drawBackgroundImage(Sprite* sprite, float x1, float y1, float x2, float y2, float depth, float rotation) {
     glPushMatrix();
     glLoadIdentity();
 
-   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glGenTextures(1, &texName);
+    glBindTexture(GL_TEXTURE_2D, texName);
 
-   glGenTextures(1, &texName);
-   glBindTexture(GL_TEXTURE_2D, texName);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, sprite->width, 
+            sprite->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
+            sprite->data);
+    glEnable(GL_TEXTURE_2D);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+    glBindTexture(GL_TEXTURE_2D, texName);
+    glBegin(GL_QUADS);
 
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, 
-                   GL_NEAREST);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
-                   GL_NEAREST);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bgGroundSprite->width, 
-                bgGroundSprite->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
-                bgGroundSprite->data);
-   glEnable(GL_TEXTURE_2D);
-   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-   glBindTexture(GL_TEXTURE_2D, texName);
-   glBegin(GL_QUADS);
+    glTexCoord2f(0.0 + rotation, 0.0); glVertex3f(x1, y1, depth);
+    glTexCoord2f(0.0 + rotation, 1.0); glVertex3f(x1, y2, depth);
+    glTexCoord2f(0.5 + rotation, 1.0); glVertex3f(x2, y2, depth);
+    glTexCoord2f(0.5 + rotation, 0.0); glVertex3f(x2, y1, depth);
 
-   glTexCoord2f(0.0, 0.0); glVertex3f(-ZOOM_1, -8, -90);
-   glTexCoord2f(0.0, 1.0); glVertex3f(-ZOOM_1, -ZOOM_1, -90);
-   glTexCoord2f(1.0, 1.0); glVertex3f(ZOOM_1, -ZOOM_1, -90);
-   glTexCoord2f(1.0, 0.0); glVertex3f(ZOOM_1, -8, -90);
+    glEnd();
+    glFlush();
+    glDisable(GL_TEXTURE_2D);
 
-   glEnd();
-   glFlush();
-   glDisable(GL_TEXTURE_2D);
-
-   glPopMatrix();
+    glPopMatrix();
 }
+
 void GUI::drawBackground() {
-    glPushMatrix();
-    glLoadIdentity();
-
-   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-   glGenTextures(1, &texName);
-   glBindTexture(GL_TEXTURE_2D, texName);
-
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, 
-                   GL_NEAREST);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
-                   GL_NEAREST);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bgSprite->width, 
-                bgSprite->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
-                bgSprite->data);
-   glEnable(GL_TEXTURE_2D);
-   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-   glBindTexture(GL_TEXTURE_2D, texName);
-   glBegin(GL_QUADS);
-   glTexCoord2f(0.0, 0.0); glVertex3f(-ZOOM_1, -ZOOM_1, -99);
-   glTexCoord2f(0.0, 1.0); glVertex3f(-ZOOM_1, ZOOM_1, -99);
-   glTexCoord2f(1.0, 1.0); glVertex3f(ZOOM_1, ZOOM_1, -99);
-   glTexCoord2f(1.0, 0.0); glVertex3f(ZOOM_1, -ZOOM_1, -99);
-
-   glEnd();
-   glFlush();
-   glDisable(GL_TEXTURE_2D);
-
-   glPopMatrix();
+    this->drawBackgroundImage(bgSprite, -ZOOM_1, -ZOOM_1+5, ZOOM_1, ZOOM_1+5, -99.0f, planetRotation);
 }
 
-void GUI::setupLight() {
+void GUI::drawGroundBackground() {
+    this->drawBackgroundImage(bgGroundSprite, -ZOOM_1, -ZOOM_1+5, ZOOM_1, 0, -98.0f, 0);
+}
+
+void GUI::sunLight() {
+#define SUN_LIGHT_STRENGHT 0.3f
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
 
-    
-#define LIGHT_STRENGHT 0.3f
-    GLfloat ambientLight[] = {LIGHT_STRENGHT, LIGHT_STRENGHT, LIGHT_STRENGHT, 0};
-    GLfloat position[] = { 40.0f, 10.0f, 0.0f, 1.0f };
+    GLfloat ambientLight[] = {
+        SUN_LIGHT_STRENGHT,
+        SUN_LIGHT_STRENGHT,
+        SUN_LIGHT_STRENGHT*0.8f
+    };
+    GLfloat position[] = {
+        ZOOM_1,
+        10.0f,
+        20.0f,
+        1.0f
+    };
 
-    glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+    //glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.4f);
+    //glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.01);
+    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.8f);
+
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, ambientLight);
     glLightfv(GL_LIGHT0, GL_POSITION, position);
 }
 
-void GUI::draw() {
-    this->simulator->stepSimulation(1./60.);
-    //glCanvas->resize(700,500);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   glShadeModel(GL_FLAT);
-   glEnable(GL_DEPTH_TEST);
+void GUI::rocketEngineLight() {
+#define ENGINE_LIGHT_STRENGTH 1.0f
+    Rocket* rocket = static_cast<Rocket*>(entityHandler->dynamicEnts["rocket"]);
+    Pose pose = rocket->getPose();
 
-    //glDisable( GL_LIGHTING );                   // Turn Off Lighting
-    //glCanvas->draw();
-    //
-    //OpenGLObject* globj = new OpenGLObject(NULL);
-    //
-    /*
+    if(fireCountdown < 0.01f) {
+        if(rocket->engineFiredCount == lastSeenEngineFire) {
+            glDisable(GL_LIGHT1);
+            return;
+        } else {
+            fireCountdown = 1.0f;
+        }
+    }
+    fireCountdown -= 0.08f;
+
+    lastSeenEngineFire = rocket->engineFiredCount;
+
+    glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT1);
-    */
 
-   this->drawBackground();
-   this->drawGroundBackground();
+    GLfloat ambientLight[] = {
+        fireCountdown*ENGINE_LIGHT_STRENGTH*1.0f,
+        fireCountdown*ENGINE_LIGHT_STRENGTH*1.0f,
+        fireCountdown*ENGINE_LIGHT_STRENGTH*0.0f,
+    };
+    GLfloat position[] = {
+        pose.worldTransform.getOrigin().x(),
+        pose.worldTransform.getOrigin().y(),
+        pose.worldTransform.getOrigin().z()
+    };
 
-   this->setupLight();
-    /*
-    */
+
+    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.0);
+    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.01);
+    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.01);
+
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, ambientLight);
+    glLightfv(GL_LIGHT1, GL_POSITION, position);
+
+    ShapeHandler *sh = ShapeHandler::getHandler();
+    OpenGLObject* rocketFireOpenGLObject = sh->getMesh("rocket_fire")->openglobj;
+    rocketFireOpenGLObject->setSprite(NULL);
+    rocketFireOpenGLObject->draw(rocket->getPose());
+    return;
+}
+
+void GUI::draw() {
+    // This function draws all objects in the world and updates the OpenGL
+    // canvas
+
+    // Update physics
+    this->simulator->stepSimulation(1./60.);
+
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glShadeModel(GL_FLAT);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+    // Draw space image
+    this->drawBackground();
+    planetRotation += -0.0001f;
+
+    // Draw moon dirt image
+    //this->drawGroundBackground();
+
+    sunLight();
+    rocketEngineLight();
 
     for(auto o : this->entityHandler->staticEnts) {
         Entity* e = o.second;
@@ -227,8 +255,10 @@ void GUI::draw() {
 
     this->glCanvas->endDraw();
 
+    // Render screen
     this->glCanvas->updateGL();
 
+    // Listen for keyboard
     QCoreApplication::instance()->installEventFilter(new KeyboardInput(this->entityHandler));
 }
 
