@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <cstdlib>
 #include <chrono>
 #include <thread>
@@ -11,7 +12,12 @@ int phys_main(int, char**);
 
 int main(int argc, char *argv[])
 {
-    if (argc != 2) exit(1);
+    if (argc != 2) {
+        printf("Usage:\n");
+        printf("  %s <port>\n", argv[0]);
+        printf("Will start the server listening on that port.\n");
+        exit(1);
+    }
     EntityHandler entityHandler;
     ZMQHandler networkHandler(atoi(argv[1]));
     Simulator simulator(&entityHandler, &networkHandler);
