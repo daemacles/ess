@@ -1,3 +1,4 @@
+QMAKE_CXX = g++-4.7
 TEMPLATE = subdirs
 SUBDIRS = esscommon libessclient cli_client qlient phys_demo server
 libessclient.depends = esscommon

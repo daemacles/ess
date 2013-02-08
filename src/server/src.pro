@@ -6,6 +6,7 @@ TEMPLATE = app
 TARGET = server
 DEPENDPATH += .
 INCLUDEPATH += .
+QMAKE_CXX = g++-4.7
 
 QT += core gui svg opengl
 

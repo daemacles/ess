@@ -5,6 +5,8 @@ isEmpty(PREFIX) {
 }
 TARGET.path = $$PREFIX/
 
+QMAKE_CXX = g++-4.7
+
 QT += opengl
 DEPENDPATH += .
 INCLUDEPATH += .
