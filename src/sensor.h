@@ -10,7 +10,7 @@ class Sensor {
     // -- ATTRIBUTES --
     protected:
     std::string name;
-    btScalar timestamp;
+    double timestamp;
     
     public:
     enum SensorType {
@@ -35,7 +35,7 @@ class Sensor {
     virtual std::string getSensorTypeString () const = 0;
 
     // Returns the time that this sensor value was taken
-    virtual btScalar getTimestamp () const = 0;
+    virtual double getTimestamp () const = 0;
 
     // Updates the sensor after a step in the dynamics world
     virtual void update (btScalar ts) = 0;

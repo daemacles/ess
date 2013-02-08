@@ -53,7 +53,10 @@ include $(SRCS:.cpp=.P)
 $(EXE): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@ $(CLIBS)
 
-client: client.o jsonserializer.o gyrosensor.o entity.o pose.o
+libessclient.a: essclient.o jsonserializer.o gyrosensor.o entity.o pose.o
+	ar rcs $@ $^
+
+client: client.o libessclient.a
 	$(CC) $(CFLAGS) $^ -o $@ $(CLIBS)
 
 clean:

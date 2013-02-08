@@ -49,6 +49,7 @@ HEADERS += accelsensor.h \
            keyboardinput.h \
            stlmesh.h \
            util.h \
+           zmqhandler.h \
            Win32DemoApplication.h
 SOURCES += \
            entity.cpp \
@@ -69,6 +70,7 @@ SOURCES += \
            simulator.cpp \
            stlmesh.cpp \
            gyrosensor.cpp \
+           zmqhandler.h \
            CcdPhysicsDemo.cpp
 
 INCLUDEPATH += $$PWD/
@@ -79,6 +81,6 @@ else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/debug/OpenGLSup
 else:unix:!symbian: PRE_TARGETDEPS += $$PWD/libOpenGLSupport.a
 
 unix: CONFIG += link_pkgconfig
-unix: PKGCONFIG += bullet
+unix: PKGCONFIG += bullet libzmq jsoncpp
 
 unix|win32: LIBS += -L. -lOpenGLSupport -lGLU -lglut -lm
