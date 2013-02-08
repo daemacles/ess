@@ -50,6 +50,15 @@ int clientThreadFn() {
 
 int main(int argc, char *argv[])
 {
+    rc.name.main1 = 0;
+    rc.name.main2 = 0;
+    rc.name.main3 = .55;
+    rc.name.main4 = .45;
+    rc.name.rot1 = 0;
+    rc.name.rot2 = 0;
+    rc.name.rot3 = 0;
+    rc.name.rot4 = 0;
+    
     qtRunning = true;
     std::thread t1(clientThreadFn);
     QApplication a(argc, argv);
