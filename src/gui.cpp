@@ -37,6 +37,8 @@ void GUI::loadRocketFireShape() {
 }
 
 void GUI::setup() {
+    keyboardInput = new KeyboardInput(this->entityHandler);
+
     bgSprite = Sprite::loadFromFile("stars.bmp");
     bgGroundSprite = Sprite::loadFromFile("dirt.bmp");
 
@@ -52,9 +54,9 @@ void GUI::setup() {
     // Set up timer to update GL screen
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(draw()));
-    timer->start(1);
+    timer->start(10);
 
-    QWidget* sensorList = this->setupSensors();
+    //QWidget* sensorList = this->setupSensors();
 
     QPushButton *resetButton = new QPushButton("Reset");
     QPushButton *button3= new QPushButton("Reset");
@@ -68,7 +70,7 @@ void GUI::setup() {
 
     QHBoxLayout* buttonRowLayout = new QHBoxLayout;
 
-    buttonRowLayout->addWidget(sensorList);
+    //buttonRowLayout->addWidget(sensorList);
     buttonRowLayout->addWidget(resetButton);
     buttonRowLayout->addWidget(button3);
     buttonRowLayout->addWidget(button4);
@@ -230,7 +232,7 @@ void GUI::draw() {
     this->glCanvas->updateGL();
 
     // Listen for keyboard
-    QCoreApplication::instance()->installEventFilter(new KeyboardInput(this->entityHandler));
+    QCoreApplication::instance()->installEventFilter(keyboardInput);
 }
 
 void GUI::drawPoseHistory() {

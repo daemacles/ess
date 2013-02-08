@@ -8,6 +8,7 @@
 #include "simulator.h"
 #include "glcanvas.h"
 #include "sprite.h"
+#include "keyboardinput.h"
 
 class GUI: public QWidget {
     // This class keeps track of all OpenGL and Qt drawing
@@ -21,6 +22,8 @@ class GUI: public QWidget {
 
         unsigned int lastSeenEngineFire;
         float fireCountdown;
+
+        KeyboardInput* keyboardInput;
 
         EntityHandler* entityHandler;
         Simulator* simulator;
