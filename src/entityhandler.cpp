@@ -5,6 +5,7 @@
 #include "entity.h"
 #include "ground.h"
 #include "rocket.h"
+#include "platform.h"
 #include "gyrosensor.h"
 
 EntityHandler::EntityHandler () {
@@ -14,12 +15,15 @@ EntityHandler::EntityHandler () {
 // TODO: convert to use a config file instead of hard coding what to load.
 void EntityHandler::init () {
     // Bring life forth into the world!
-    addDynamic("rocket", new Rocket());
+    addDynamic("rocket", new Rocket(btVector3(10,1,-1)));
     // Save a handle to our rocket.
     rocket = static_cast<Rocket *>(dynamicEnts["rocket"]);
 
     // STATIC ENTITIES
     addStatic("ground", new Ground());
+
+    addStatic("platform1", new Platform(btVector3(10,-9,0)));
+    addStatic("platform2", new Platform(btVector3(-15,-9,0)));
 
     // SENSORS
     addSensor("gyro", new GyroSensor("Rocket Gyro", rocket));

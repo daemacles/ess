@@ -19,12 +19,14 @@ Ground::Ground(btScalar width, btScalar length) {
     
     btCollisionShape *groundShape = sh->getShape("mars");
     this->openglObject = sh->getMesh("mars")->openglobj;
+    float color[4] = {0.5f, 0.35f, 0.05f, 1.0f};
+    this->openglObject->setColor(color);
 
     // Set up our beginning transform
     //btQuaternion rot(0,0,0,1);
     btTransform trans;
     trans.setIdentity();
-    trans.setOrigin(btVector3(0,0,0));
+    trans.setOrigin(btVector3(-20,0,10));
     //trans.setRotation(btQuaternion(btVector3(1, 0, 0), 0));
   
     initRigidBody(0.0f, groundShape, trans);

@@ -29,6 +29,8 @@ HEADERS += accelsensor.h \
            GlutStuff.h \
            ground.h \
            gui.h \
+           jsonserializer.h \
+           zmqhandler.h \
            gyrosensor.h \
            main.h \
            networkhandler.h \
@@ -58,6 +60,7 @@ SOURCES += \
            ground.cpp \
            gui.cpp \
            main.cpp \
+           platform.cpp \
            keyboardinput.cpp \
            objparser.cpp \
            openglobject.cpp \
@@ -68,6 +71,8 @@ SOURCES += \
            sensor.cpp \
            shapehandler.cpp \
            simulator.cpp \
+           zmqhandler.cpp \
+           jsonserializer.cpp \
            stlmesh.cpp \
            gyrosensor.cpp \
            zmqhandler.h \

@@ -19,10 +19,9 @@ void OpenGLObject::setSprite(Sprite* sprite) {
 }
 
 OpenGLObject::OpenGLObject(std::vector<btVector3*> polygons) {
-    this->color[0] = 0.5;
-    this->color[1] = 0.5;
-    this->color[2] = 0.5;
-    this->color[3] = 1;
+    this->color[0] = 1.0f;
+    this->color[1] = 1.0f;
+    this->color[2] = 0.0f;
     printf("OpenGLObject created with %d polygons\n", polygons.size());
     this->polygons = std::vector<btVector3*>(polygons.size());
     for(int i = 0; i < this->polygons.size(); i++) {
@@ -48,10 +47,9 @@ void OpenGLObject::draw(Pose& pose) {
     //
 
     glTranslatef(pose.worldTransform.getOrigin().x(), pose.worldTransform.getOrigin().y(), pose.worldTransform.getOrigin().z());
-    glTranslatef(0, -10, 0);
+    //glTranslatef(0, -10, 0);
     /*
     */
-    //glRotatef(90, 0, 0, 0);
 
     btQuaternion quat = pose.worldTransform.getRotation();
     btVector3 axis = quat.getAxis();

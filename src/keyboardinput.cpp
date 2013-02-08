@@ -15,24 +15,25 @@ bool KeyboardInput::eventFilter(QObject *obj, QEvent *event)
 
         switch(KeyEvent->key())
         {
+#define FORCE 0.1
             case Qt::Key_Up:
                 {
                     Rocket* rocket = static_cast<Rocket*>(entityHandler->dynamicEnts["rocket"]);
-                    RocketControl control = {0.205, 0.205, 0.205, 0.205, 0, 0, 0, 0};
+                    RocketControl control = {FORCE, FORCE, FORCE, FORCE, 0, 0, 0, 0};
                     rocket->applyControl(control);
                     return false;
                 }
             case Qt::Key_Right:
                 {
                     Rocket* rocket = static_cast<Rocket*>(entityHandler->dynamicEnts["rocket"]);
-                    RocketControl control = {0.205, 0, 0.205, 0, 0, 0, 0, 0};
+                    RocketControl control = {FORCE, 0, FORCE, 0, 0, 0, 0, 0};
                     rocket->applyControl(control);
                     return false;
                 }
             case Qt::Key_Left:
                 {
                     Rocket* rocket = static_cast<Rocket*>(entityHandler->dynamicEnts["rocket"]);
-                    RocketControl control = {0, 0.205, 0, 0.205, 0, 0, 0, 0};
+                    RocketControl control = {0, FORCE, 0, FORCE, 0, 0, 0, 0};
                     rocket->applyControl(control);
                     return false;
                 }
