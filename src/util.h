@@ -1,5 +1,0 @@
-typedef 
-
-struct vec3 {
-
-};

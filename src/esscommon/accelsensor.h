@@ -1,0 +1,3 @@
+class AccelSensor:public Sensor {
+
+};

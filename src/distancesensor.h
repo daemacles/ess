@@ -1,3 +1,0 @@
-class DistanceSensor:public Sensor {
-
-};

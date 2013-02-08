@@ -1,3 +1,0 @@
-class Radar:public Entity {
-
-};
