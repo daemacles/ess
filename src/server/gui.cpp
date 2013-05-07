@@ -220,11 +220,12 @@ void GUI::draw() {
     //this->drawGroundBackground();
     //
 
-    drawPoseHistory();
 
     sunLight();
-    rocketEngineLight();
 
+    entityHandler->lock();
+    rocketEngineLight();
+    drawPoseHistory();
     for(auto o : this->entityHandler->staticEnts) {
         Entity* e = o.second;
         e->getOpenGLObject()->draw(e->getPose());
@@ -233,6 +234,7 @@ void GUI::draw() {
         Entity* e = o.second;
         e->getOpenGLObject()->draw(e->getPose());
     }
+    entityHandler->unlock();
 
     this->glCanvas->endDraw();
 
@@ -252,7 +254,7 @@ void GUI::drawPoseHistory() {
     glBegin(GL_LINE_STRIP);
         float color[] = {1.0f, 1.0f, 1.0f};
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, color);
-        for(auto pose: rocket->poseHistory) {
+        for(auto &pose: rocket->poseHistory) {
             glVertex3f(
                     pose.worldTransform.getOrigin().x(),
                     pose.worldTransform.getOrigin().y(),
